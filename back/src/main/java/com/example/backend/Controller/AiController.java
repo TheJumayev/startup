@@ -1,10 +1,15 @@
 package com.example.backend.Controller;
 
+import com.example.backend.DTO.GenerateTaskResponse;
 import com.example.backend.Entity.Student;
 import com.example.backend.Repository.StudentRepo;
+import com.example.backend.Services.AiServise.AiGenerationService;
+import com.example.backend.Services.FileReaderService.FileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -21,7 +26,18 @@ import java.util.zip.ZipOutputStream;
 @RequiredArgsConstructor
 public class AiController {
 
+    private final FileService fileService;
+    private final AiGenerationService aiGenerationService;
     private final StudentRepo studentRepo;
+
+    @PostMapping("/generate-task")
+    public GenerateTaskResponse generateTask(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("type") String type
+    ) {
+        String text = fileService.extractText(file);
+        return aiGenerationService.generate(text, type);
+    }
 
     @GetMapping("/generate-certificates/{groupId}")
     public ResponseEntity<byte[]> generateCertificates(@PathVariable UUID groupId) throws Exception {

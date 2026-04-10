@@ -20,6 +20,8 @@ import java.util.UUID;
 @RequestMapping("/api/v1/curriculm")
 public class CurriculmController {
 
+
+
     private final CurriculmRepo curriculumRepo;
     private final UserRepo userRepo;
     private final SubjectsRepo subjectsRepo;

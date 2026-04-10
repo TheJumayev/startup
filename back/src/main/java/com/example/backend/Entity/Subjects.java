@@ -6,21 +6,20 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.UUID;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-@Table(name = "groups")
+@Table(name = "subjects")
 @Entity
 @Builder
-public class Groups {
+public class Subjects {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
     private String name;
     private String description;
-    private String semesterName;
-    private LocalDateTime createdAt;
+    private LocalDate createAt;
 }

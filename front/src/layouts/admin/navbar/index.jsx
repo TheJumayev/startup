@@ -1,28 +1,22 @@
-import { useLocation, useNavigate } from "react-router-dom";
-import Dropdown from "components/dropdown";
-import { FiAlignJustify } from "react-icons/fi";
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import navbarimage from "assets/img/layout/Navbar.png";
-import { BsArrowBarUp } from "react-icons/bs";
+import { FiAlignJustify } from "react-icons/fi";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { FiSearch } from "react-icons/fi";
 import { RiMoonFill, RiSunFill } from "react-icons/ri";
+import { MdPerson } from "react-icons/md";
+import ApiCall from "../../../config";
+import Dropdown from "../../../components/dropdown"
 import {
   IoMdNotificationsOutline,
   IoMdInformationCircleOutline,
 } from "react-icons/io";
-import avatar from "assets/img/avatars/avatar4.png";
-import axios from "axios";
-import { MdPerson } from "react-icons/md";
-import ApiCall from "../../../config";
 
 const Navbar = (props) => {
   const navigate = useNavigate();
-  const location = useLocation(); // 🔹 hozirgi pathni olish uchun
+  const location = useLocation();
   const { onOpenSidenav, brandText } = props;
   const [darkmode, setDarkmode] = React.useState(false);
   const [admin, setAdmin] = useState(null);
-
   useEffect(() => {
     getAdmin();
   }, []);
@@ -37,21 +31,22 @@ const Navbar = (props) => {
       const response = await ApiCall("/api/v1/auth/decode", "GET", null);
       const data = response.data;
       setAdmin(data);
-      // 🔹 Agar foydalanuvchi admin bo‘lmasa yoki login qilmagan bo‘lsa
+
+      if (response.data.status === 500) {
+        navigate("/admin/login");
+      }
+      // 🔹 faqat login sahifasida bo‘lmaganida redirect qilamiz
       if (!data || data.roles?.[0]?.name !== "ROLE_ADMIN") {
-        // faqat login sahifasida bo‘lmaganida navigate qilamiz
         navigate("/admin/login");
       }
     } catch (error) {
-      // 🔹 Agar token buzilgan bo‘lsa yoki decode xato bersa
-      if (location.pathname !== "/admin/login") {
-        navigate("/admin/login");
-      }
+      navigate("/admin/login");
+
       console.error("Error fetching account data:", error);
     }
   };
 
-  // 🔹 Admin null bo‘lguncha Navbarni umuman render qilmaslik
+  // 🔹 Yuklanmagan paytda navbar chiqarmaslik
   if (admin === null && location.pathname !== "/admin/login") {
     return null;
   }
@@ -59,6 +54,14 @@ const Navbar = (props) => {
     <nav className="sticky top-4 z-40 flex flex-row flex-wrap items-center justify-between rounded-xl bg-white/10 p-2 backdrop-blur-xl dark:bg-[#0b14374d]">
       <div className="ml-[6px]">
         <div className="h-6 w-[224px] pt-1">
+          <a
+            className="text-sm font-normal text-navy-700 hover:underline dark:text-white dark:hover:text-white"
+            href=" "
+          >
+            <span className="mx-1 text-sm text-navy-700 hover:text-navy-700 dark:text-white">
+              {" "}
+            </span>
+          </a>
           <Link
             className="text-sm font-normal capitalize text-navy-700 hover:underline dark:text-white dark:hover:text-white"
             to="#"
@@ -111,34 +114,6 @@ const Navbar = (props) => {
                   Barchasi
                 </p>
               </div>
-
-              {/*<button className="flex w-full items-center">*/}
-              {/*  <div className="flex h-full w-[85px] items-center justify-center rounded-xl bg-gradient-to-b from-brandLinear to-brand-500 py-4 text-2xl text-white">*/}
-              {/*    <BsArrowBarUp />*/}
-              {/*  </div>*/}
-              {/*  <div className="ml-2 flex h-full w-full flex-col justify-center rounded-lg px-1 text-sm">*/}
-              {/*    <p className="mb-1 text-left text-base font-bold text-gray-900 dark:text-white">*/}
-              {/*      New Update: Horizon UI Dashboard PRO*/}
-              {/*    </p>*/}
-              {/*    <p className="font-base text-left text-xs text-gray-900 dark:text-white">*/}
-              {/*      A new update for your downloaded item is available!*/}
-              {/*    </p>*/}
-              {/*  </div>*/}
-              {/*</button>*/}
-
-              {/*<button className="flex w-full items-center">*/}
-              {/*  <div className="flex h-full w-[85px] items-center justify-center rounded-xl bg-gradient-to-b from-brandLinear to-brand-500 py-4 text-2xl text-white">*/}
-              {/*    <BsArrowBarUp />*/}
-              {/*  </div>*/}
-              {/*  <div className="ml-2 flex h-full w-full flex-col justify-center rounded-lg px-1 text-sm">*/}
-              {/*    <p className="mb-1 text-left text-base font-bold text-gray-900 dark:text-white">*/}
-              {/*      New Update: Horizon UI Dashboard PRO*/}
-              {/*    </p>*/}
-              {/*    <p className="font-base text-left text-xs text-gray-900 dark:text-white">*/}
-              {/*      A new update for your downloaded item is available!*/}
-              {/*    </p>*/}
-              {/*  </div>*/}
-              {/*</button>*/}
             </div>
           }
           classNames={"py-2 top-4 -left-[230px] md:-left-[440px] w-max"}
@@ -159,27 +134,6 @@ const Navbar = (props) => {
                 }}
                 className="mb-2 aspect-video w-full rounded-lg"
               />
-              {/*<a*/}
-              {/*  target="blank"*/}
-              {/*  href="https://horizon-ui.com/pro?ref=live-free-tailwind-react"*/}
-              {/*  className="px-full linear flex cursor-pointer items-center justify-center rounded-xl bg-brand-500 py-[11px] font-bold text-white transition duration-200 hover:bg-brand-600 hover:text-white active:bg-brand-700 dark:bg-brand-400 dark:hover:bg-brand-300 dark:active:bg-brand-200"*/}
-              {/*>*/}
-              {/*  Buy Horizon UI PRO*/}
-              {/*</a>*/}
-              {/*<a*/}
-              {/*  target="blank"*/}
-              {/*  href="https://horizon-ui.com/docs-tailwind/docs/react/installation?ref=live-free-tailwind-react"*/}
-              {/*  className="px-full linear flex cursor-pointer items-center justify-center rounded-xl border py-[11px] font-bold text-navy-700 transition duration-200 hover:bg-gray-200 hover:text-navy-700 dark:!border-white/10 dark:text-white dark:hover:bg-white/20 dark:hover:text-white dark:active:bg-white/10"*/}
-              {/*>*/}
-              {/*  See Documentation*/}
-              {/*</a>*/}
-              {/*<a*/}
-              {/*  target="blank"*/}
-              {/*  href="https://horizon-ui.com/?ref=live-free-tailwind-react"*/}
-              {/*  className="hover:bg-black px-full linear flex cursor-pointer items-center justify-center rounded-xl py-[11px] font-bold text-navy-700 transition duration-200 hover:text-navy-700 dark:text-white dark:hover:text-white"*/}
-              {/*>*/}
-              {/*  Try Horizon Free*/}
-              {/*</a>*/}
             </div>
           }
           classNames={"py-2 top-6 -left-[250px] md:-left-[330px] w-max"}

@@ -3,8 +3,8 @@ import ApiCall from "../../../config";
 import { MdAdd, MdEdit, MdDelete, MdSearch } from "react-icons/md";
 import Card from "components/card";
 
-const Curriculum = () => {
-  const [curriculums, setCurriculums] = useState([]);
+const Subjects = () => {
+  const [subjects, setSubjects] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showForm, setShowForm] = useState(false);
@@ -14,22 +14,21 @@ const Curriculum = () => {
     name: "",
     code: "",
     description: "",
-    duration: "",
   });
 
   useEffect(() => {
-    fetchCurriculums();
+    fetchSubjects();
   }, []);
 
-  const fetchCurriculums = async () => {
+  const fetchSubjects = async () => {
     try {
       setLoading(true);
-      const response = await ApiCall("/api/v1/curriculums", "GET", null);
-      setCurriculums(response.data || []);
+      const response = await ApiCall("/api/v1/subjects", "GET", null);
+      setSubjects(response.data || []);
       setError("");
     } catch (err) {
-      console.error("Error fetching curriculums:", err);
-      setError("O'quv dasturlarni yuklashda xatolik");
+      console.error("Error fetching subjects:", err);
+      setError("Fanlarni yuklashda xatolik");
     } finally {
       setLoading(false);
     }
@@ -40,50 +39,49 @@ const Curriculum = () => {
     try {
       setLoading(true);
       if (editingId) {
-        await ApiCall(`/api/v1/curriculums/${editingId}`, "PUT", formData);
+        await ApiCall(`/api/v1/subjects/${editingId}`, "PUT", formData);
       } else {
-        await ApiCall("/api/v1/curriculums", "POST", formData);
+        await ApiCall("/api/v1/subjects", "POST", formData);
       }
-      setFormData({ name: "", code: "", description: "", duration: "" });
+      setFormData({ name: "", code: "", description: "" });
       setEditingId(null);
       setShowForm(false);
-      fetchCurriculums();
+      fetchSubjects();
     } catch (err) {
-      console.error("Error saving curriculum:", err);
-      setError("O'quv dasturini saqlashda xatolik");
+      console.error("Error saving subject:", err);
+      setError("Fanni saqlashda xatolik");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleEdit = (curriculum) => {
+  const handleEdit = (subject) => {
     setFormData({
-      name: curriculum.name,
-      code: curriculum.code,
-      description: curriculum.description,
-      duration: curriculum.duration,
+      name: subject.name,
+      code: subject.code,
+      description: subject.description,
     });
-    setEditingId(curriculum.id);
+    setEditingId(subject.id);
     setShowForm(true);
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm("O'quv dasturini o'chirishni tasdiqlaysizmi?")) {
+    if (window.confirm("Fanni o'chirishni tasdiqlaysizmi?")) {
       try {
         setLoading(true);
-        await ApiCall(`/api/v1/curriculums/${id}`, "DELETE", null);
-        fetchCurriculums();
+        await ApiCall(`/api/v1/subjects/${id}`, "DELETE", null);
+        fetchSubjects();
       } catch (err) {
-        console.error("Error deleting curriculum:", err);
-        setError("O'quv dasturini o'chirishda xatolik");
+        console.error("Error deleting subject:", err);
+        setError("Fanni o'chirishda xatolik");
       } finally {
         setLoading(false);
       }
     }
   };
 
-  const filteredCurriculums = curriculums.filter((curriculum) =>
-    curriculum.name.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredSubjects = subjects.filter((subject) =>
+    subject.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -92,19 +90,19 @@ const Curriculum = () => {
         <div className="mb-4 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
           <div className="flex items-center gap-2">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-              📖 O'quv dasturlari
+              📚 Fanlar
             </h2>
           </div>
           <button
             onClick={() => {
-              setFormData({ name: "", code: "", description: "", duration: "" });
+              setFormData({ name: "", code: "", description: "" });
               setEditingId(null);
               setShowForm(!showForm);
             }}
             className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
           >
             <MdAdd className="h-5 w-5" />
-            Yangi dastur
+            Yangi fan
           </button>
         </div>
 
@@ -118,7 +116,7 @@ const Curriculum = () => {
           <form onSubmit={handleSubmit} className="mb-6 space-y-4 rounded-lg bg-gray-50 p-4 dark:bg-gray-800">
             <div>
               <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Dastur nomi
+                Fan nomi
               </label>
               <input
                 type="text"
@@ -126,7 +124,7 @@ const Curriculum = () => {
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 required
                 className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                placeholder="Dastur nomi kiriting"
+                placeholder="Fan nomi kiriting"
               />
             </div>
             <div>
@@ -138,19 +136,7 @@ const Curriculum = () => {
                 value={formData.code}
                 onChange={(e) => setFormData({ ...formData, code: e.target.value })}
                 className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                placeholder="Dastur kodi kiriting"
-              />
-            </div>
-            <div>
-              <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Muddati (oylar)
-              </label>
-              <input
-                type="number"
-                value={formData.duration}
-                onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
-                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                placeholder="Muddati oylar bilan kiriting"
+                placeholder="Fan kodi kiriting"
               />
             </div>
             <div>
@@ -189,7 +175,7 @@ const Curriculum = () => {
             <MdSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
               type="text"
-              placeholder="O'quv dasturlarini qidirish..."
+              placeholder="Fanlarni qidirish..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full rounded-lg border border-gray-300 bg-white py-2 pl-10 pr-4 text-gray-900 focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
@@ -200,9 +186,9 @@ const Curriculum = () => {
 
       {loading && <div className="text-center">Yuklanmoqda...</div>}
 
-      {filteredCurriculums.length === 0 ? (
+      {filteredSubjects.length === 0 ? (
         <Card extra="p-6 text-center">
-          <p className="text-gray-500">O'quv dasturlari topilmadi</p>
+          <p className="text-gray-500">Fanlar topilmadi</p>
         </Card>
       ) : (
         <div className="overflow-x-auto">
@@ -216,9 +202,6 @@ const Curriculum = () => {
                   Kod
                 </th>
                 <th className="border border-gray-300 px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:border-gray-600 dark:text-white">
-                  Muddati
-                </th>
-                <th className="border border-gray-300 px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:border-gray-600 dark:text-white">
                   Tavsif
                 </th>
                 <th className="border border-gray-300 px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:border-gray-600 dark:text-white">
@@ -227,30 +210,27 @@ const Curriculum = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredCurriculums.map((curriculum) => (
-                <tr key={curriculum.id} className="border border-gray-200 hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800">
+              {filteredSubjects.map((subject) => (
+                <tr key={subject.id} className="border border-gray-200 hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800">
                   <td className="border border-gray-300 px-4 py-3 text-gray-900 dark:border-gray-600 dark:text-white">
-                    {curriculum.name}
+                    {subject.name}
                   </td>
                   <td className="border border-gray-300 px-4 py-3 text-gray-900 dark:border-gray-600 dark:text-white">
-                    {curriculum.code}
-                  </td>
-                  <td className="border border-gray-300 px-4 py-3 text-gray-900 dark:border-gray-600 dark:text-white">
-                    {curriculum.duration} oy
+                    {subject.code}
                   </td>
                   <td className="border border-gray-300 px-4 py-3 text-gray-600 dark:border-gray-600 dark:text-gray-400">
-                    {curriculum.description}
+                    {subject.description}
                   </td>
                   <td className="border border-gray-300 px-4 py-3">
                     <div className="flex gap-2">
                       <button
-                        onClick={() => handleEdit(curriculum)}
+                        onClick={() => handleEdit(subject)}
                         className="rounded bg-blue-500 p-2 text-white hover:bg-blue-600"
                       >
                         <MdEdit className="h-4 w-4" />
                       </button>
                       <button
-                        onClick={() => handleDelete(curriculum.id)}
+                        onClick={() => handleDelete(subject.id)}
                         className="rounded bg-red-500 p-2 text-white hover:bg-red-600"
                       >
                         <MdDelete className="h-4 w-4" />
@@ -267,5 +247,5 @@ const Curriculum = () => {
   );
 };
 
-export default Curriculum;
+export default Subjects;
 

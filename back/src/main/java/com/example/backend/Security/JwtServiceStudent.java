@@ -2,7 +2,6 @@ package com.example.backend.Security;
 
 
 import com.example.backend.Entity.Student;
-import com.example.backend.Entity.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;

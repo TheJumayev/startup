@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -25,7 +26,10 @@ public class User implements UserDetails {
     @Column(unique = true, nullable = false)
     private String phone;
     private String password;
+    @Column(unique = true)
+    private Integer number;
     private String name;
+    private LocalDateTime created_at;
     @ManyToMany(fetch = FetchType.EAGER)
     private List<Role> roles;
 

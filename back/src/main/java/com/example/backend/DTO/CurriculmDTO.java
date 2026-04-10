@@ -4,17 +4,19 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserDTO {
-    private String phone;
-    private String password;
-    private boolean rememberMe;
+public class CurriculmDTO {
     private UUID id;
     private String name;
-    private List<Integer> roleIds;
+    private String description;
+    private UUID userId;
+    private UUID subjectsId;
+    private UUID groupsId;
+    private LocalDate createAt;
 }
+

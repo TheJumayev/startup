@@ -1,87 +1,51 @@
 package com.example.backend.Controller;
 
-import com.example.backend.DTO.UserSave;
-import com.example.backend.Entity.Role;
+import com.example.backend.DTO.UserDTO;
 import com.example.backend.Entity.User;
-import com.example.backend.Enums.UserRoles;
-import com.example.backend.Repository.RoleRepo;
-import com.example.backend.Repository.UserRepo;
+import com.example.backend.Services.UserService.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
-@CrossOrigin
 @RestController
-@RequestMapping("/api/v1/admin")
 @RequiredArgsConstructor
+@CrossOrigin
+@RequestMapping("/api/v1/admin/users")
 public class AdminController {
 
-    private final RoleRepo roleRepo;
-    private final UserRepo userRepo;
-    private final PasswordEncoder passwordEncoder;
+    private final UserService userService;
+
 
 
     @PostMapping
-    public HttpEntity<?> addAdmin(@RequestBody UserSave userSave) {
-        if (userSave.getName() == null || userSave.getPassword() == null || userSave.getPhone() == null ||
-                userSave.getName().isEmpty() || userSave.getPassword().isEmpty() || userSave.getPhone().isEmpty()) {
-            return ResponseEntity.badRequest().body("Name, phone or password is missing");
-        }
-
-        Role adminRole = roleRepo.findByName(UserRoles.ROLE_ADMIN);
-        if (adminRole == null) {
-            return ResponseEntity.badRequest().body("Admin role not found");
-        }
-
-        String encodedPassword = passwordEncoder.encode(userSave.getPassword());
-
-        User user = new User(userSave.getPhone(), encodedPassword, userSave.getName(), Collections.singletonList(adminRole));
-        User saved = userRepo.save(user);
-        return ResponseEntity.ok(saved);
-    }
-
-
-
-    @GetMapping
-    public HttpEntity<?> getAdmins() {
-        List<User> allAdminsByRole = userRepo.findAllAdminsByRole();
-        return ResponseEntity.ok(allAdminsByRole);
+    public ResponseEntity<User> create(@RequestBody UserDTO dto) {
+        return ResponseEntity.ok(userService.create(dto));
     }
 
     @PutMapping("/{id}")
-    public HttpEntity<?> updateAdmin(@PathVariable UUID id, @RequestBody UserSave userSave) {
-        Optional<User> optionalUser = userRepo.findById(id);
-        if (optionalUser.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        User user = optionalUser.get();
-        if (userSave.getName() != null) user.setName(userSave.getName());
-        if (userSave.getPhone() != null) user.setPhone(userSave.getPhone());
-        if (userSave.getPassword() != null) {
-            String encodedPassword = passwordEncoder.encode(userSave.getPassword());
-            user.setPassword(encodedPassword);
-        }
-        User updated = userRepo.save(user);
-        return ResponseEntity.ok(updated);
+    public ResponseEntity<User> update(
+            @PathVariable UUID id,
+            @RequestBody UserDTO dto
+    ) {
+        return ResponseEntity.ok(userService.update(id, dto));
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<User> getById(@PathVariable UUID id) {
+        return ResponseEntity.ok(userService.getById(id));
+    }
 
+    @GetMapping
+    public ResponseEntity<List<User>> getAll() {
+        return ResponseEntity.ok(userService.getAll());
+    }
 
     @DeleteMapping("/{id}")
-    public HttpEntity<?> deleteAdmin(@PathVariable UUID id) {
-        Optional<User> optionalUser = userRepo.findById(id);
-        if (optionalUser.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-
-        userRepo.deleteById(id);
-        return ResponseEntity.ok("Admin deleted successfully");
+    public ResponseEntity<Void> delete(@PathVariable UUID id) {
+        userService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }

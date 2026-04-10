@@ -1,17 +1,14 @@
+import React from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
 import Navbar from "./navbar";
 import Sidebar from "./sidebar";
-import Footer from "components/footer/Footer";
-import React, { useEffect, useState } from "react";
 import routes from "../../routes/admin";
-import ApiCall from "../../config/index";
 
 export default function Admin(props) {
   const { ...rest } = props;
   const location = useLocation();
   const [open, setOpen] = React.useState(true);
-  const [currentRoute, setCurrentRoute] = React.useState("Main Dashboard");
+  const [currentRoute, setCurrentRoute] = React.useState("Bosh sahifa");
 
   React.useEffect(() => {
     window.addEventListener("resize", () =>
@@ -23,7 +20,7 @@ export default function Admin(props) {
   }, [location.pathname]);
 
   const getActiveRoute = (routes) => {
-    let activeRoute = "Main Dashboard";
+    let activeRoute = "Bosh sahifa";
     for (let i = 0; i < routes.length; i++) {
       if (
         window.location.href.indexOf(
@@ -73,7 +70,7 @@ export default function Admin(props) {
           <div className="h-full">
             <Navbar
               onOpenSidenav={() => setOpen(true)}
-              logoText={"Horizon UI Tailwind React"}
+              logoText={""}
               brandText={currentRoute}
               secondary={getActiveNavbar(routes)}
               {...rest}
@@ -87,9 +84,6 @@ export default function Admin(props) {
                   element={<Navigate to="/admin/default" replace />}
                 />
               </Routes>
-            </div>
-            <div className="p-3">
-              <Footer />
             </div>
           </div>
         </main>

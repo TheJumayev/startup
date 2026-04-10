@@ -1,25 +1,7 @@
-import MiniCalendar from "components/calendar/MiniCalendar";
-import WeeklyRevenue from "views/admin/default/components/WeeklyRevenue";
-import TotalSpent from "views/admin/default/components/TotalSpent";
-import PieChartCard from "views/admin/default/components/PieChartCard";
-import { IoMdHome } from "react-icons/io";
-import { IoDocuments } from "react-icons/io5";
-import { MdBarChart, MdDashboard } from "react-icons/md";
-
-import { columnsDataCheck, columnsDataComplex } from "./variables/columnsData";
-
-import Widget from "components/widget/Widget";
-import CheckTable from "views/admin/default/components/CheckTable";
-import ComplexTable from "views/admin/default/components/ComplexTable";
-import DailyTraffic from "views/admin/default/components/DailyTraffic";
-import TaskCard from "views/admin/default/components/TaskCard";
-import tableDataCheck from "./variables/tableDataCheck.json";
-import tableDataComplex from "./variables/tableDataComplex.json";
 import { useNavigate } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import ApiCall from "../../../config";
-import Card from "../../../components/card";
-
+import Card from "components/card"
 const Dashboard = () => {
   const navigate = useNavigate();
 
@@ -33,7 +15,7 @@ const Dashboard = () => {
     try {
       const response = await ApiCall("/api/v1/auth/decode", "GET", null);
       console.log(response);
-      
+
       setAdmin(response.data);
     } catch (error) {
       navigate("/admin/login");

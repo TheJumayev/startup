@@ -1,11 +1,27 @@
 import ModalForcePasswordChange from "../profile/CheckPassword"; // 🔥 mana shu qo'shiladi
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import ApiCall, { baseUrl } from "../../../config";
 import { toast, ToastContainer } from "react-toastify";
-import { getStudentRoutes } from "../util/studentRoutesFilter";
-import routes from "../../../routes/student";
-import { MdLogout } from "react-icons/md";
+import {
+  FaHome,
+  FaFileInvoiceDollar,
+  FaListUl,
+  FaRegFileAlt,
+  FaTasks,
+} from "react-icons/fa"; // ikonlar
+
+import {
+  MdArticle,
+  MdBook,
+  MdAccountCircle,
+  MdLogout,
+  MdOndemandVideo,
+  MdPlayLesson,
+  MdOutlineRule,
+  MdHomeWork,
+  MdScore,
+} from "react-icons/md";
 
 const Dashboard = () => {
   const [forcePasswordModal, setForcePasswordModal] = useState(false);
@@ -31,11 +47,6 @@ const Dashboard = () => {
   const debt = Math.max(finalAmount - payment, 0);
   const extra = Math.max(payment - finalAmount, 0);
 
-  const students = getStudentRoutes(
-    routes,
-    student?.educationType,
-    student?.isGroupLeader
-  );
   const paidAmount = contract?.payment || 0;
   // Majburiy to'lov summasi (50% kontraktdan)
   const requiredAmount =
@@ -65,8 +76,8 @@ ${student?.groupName} guruh talabasi ${student?.fullName} tomonidan`;
     student?.fullName
   } ${currentYear}-${currentYear + 1} o'quv yilining ${
     student?.semesterName
-  }dan Buxoro xalqaro universitetida shartnoma asosida tahsil olayotganimni ma'lum qilaman. Umumiy kontrakt summasi ${finalAmount.toLocaleString()} so'mni tashkil etadi. Amaldagi tartibga muvofiq, ushbu summaning ${percent}% miqdori — ${requiredAmount.toLocaleString()} so'm bo'lib, shundan ${paidAmount.toLocaleString()} so'mi to'langan. Qolgan ${percentAmount.toLocaleString()} so'mni ${safeDate} ga qadar to'lashga kafolat beraman. Shartnoma bo'yicha qolgan summani joriy yilning 1-may sanasiga qadar to'lashga kafolat beraman.
-  Kontrakt to’lovini belgilangan muddat ichida to’lay olmasam Vazirlar Mahkamasining tegishli qarorlariga asosan talabalar safidan chetlashtirishingizga hech qanday e’tirozim yo’q. Qarzdor fanlarni o’z vaqtida topshirmasam Vazirlar Mahkamasining tegishli qarorlariga asosan menga avgust oyida kredit-modul tizimi asosida topshirishim yoki kursdan qolishim haqida ogohlantirishdi. Hech kimga hech qanday e’tirozim yo’q.`;
+  }dan Buxoro xalqaro universitetida shartnoma asosida tahsil olayotganimni ma'lum qilaman. Umumiy kontrakt summasi ${finalAmount.toLocaleString()} so'mni tashkil etadi. Amaldagi tartibga muvofiq, ushbu summaning ${percent}% miqdori — ${requiredAmount.toLocaleString()} so'm bo'lib, shundan ${paidAmount.toLocaleString()} so'mi to'langan. Qolgan ${percentAmount.toLocaleString()} so'mni ${safeDate} ga qadar to'lashga kafolat beraman.
+`;
   const space = "\u00A0".repeat(15);
   const text3 = `${student?.fullName}${space}${todayFormatted}`;
 
@@ -214,27 +225,19 @@ ${student?.groupName} guruh talabasi ${student?.fullName} tomonidan`;
 
   const canUpload = !kafolat || (kafolat.status === true && isExpired);
 
-  // Hozirgi sana
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = now.getMonth() + 1;
+  const currentStudyYear = `${currentYear}-${currentYear + 1}`;
 
-  // TO‘G‘RI O‘QUV YILI HISOBI
-  const currentStudyYear =
-    month >= 9 ? `${year}-${year + 1}` : `${year - 1}-${year}`;
   const fetchContract = async (hemisId) => {
     try {
       // 1. Oddiy kontrakt
       const res = await ApiCall(`/api/v1/contract/student/${hemisId}`, "GET");
       const contractData = res.data;
-      console.log(res.data);
 
       // 2. Chegirma ma'lumoti
       const response = await ApiCall(
         `/api/v1/discount-student/${contractData.passportNumber}`,
         "GET"
       );
-      console.log(response.data);
 
       let discountAmount = 0;
 
@@ -273,7 +276,7 @@ ${student?.groupName} guruh talabasi ${student?.fullName} tomonidan`;
   return (
     <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
       <ToastContainer />
-      <div className="max-w-8xl mx-auto">
+      <div className="mx-auto max-w-4xl">
         {/* Student info */}
         <div className="mb-8 rounded-2xl bg-white p-4 shadow-lg md:p-6">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between">
@@ -341,7 +344,7 @@ ${student?.groupName} guruh talabasi ${student?.fullName} tomonidan`;
               Sizga kontrakt topilmadi. Registrator ofisga murojaat qiling.
             </p>
           ) : (
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="items-center justify-between gap-6 md:flex">
               {/* Asosiy summa */}
               <div>
                 <p className="text-sm text-gray-500">Asosiy summa</p>
@@ -350,23 +353,23 @@ ${student?.groupName} guruh talabasi ${student?.fullName} tomonidan`;
                 </p>
               </div>
 
-              {/* Yakuniy kontrakt */}
+              {/* Chegirma (faqat > 0 bo'lsa ko'rinadi) */}
               {discount > 0 && (
-                <div>
-                  <p className="text-sm text-gray-500">Yakuniy kontrakt</p>
-                  <p className="text-lg font-semibold text-blue-600">
-                    {finalAmount.toLocaleString()} so'm
-                  </p>
-                </div>
-              )}
+                <div className="items-center justify-between gap-4 md:flex">
+                  <div>
+                    <p className="text-sm text-gray-500">Chegirma</p>
+                    <p className="text-lg font-semibold text-green-600">
+                      {discount.toLocaleString()} so'm
+                    </p>
+                  </div>
 
-              {/* Chegirma */}
-              {discount > 0 && (
-                <div>
-                  <p className="text-sm text-gray-500">Chegirma</p>
-                  <p className="text-lg font-semibold text-green-600">
-                    {discount.toLocaleString()} so'm
-                  </p>
+                  {/* Yakuniy kontrakt */}
+                  <div>
+                    <p className="text-sm text-gray-500">Yakuniy kontrakt</p>
+                    <p className="text-lg font-semibold text-blue-600">
+                      {finalAmount.toLocaleString()} so'm
+                    </p>
+                  </div>
                 </div>
               )}
 
@@ -408,57 +411,161 @@ ${student?.groupName} guruh talabasi ${student?.fullName} tomonidan`;
         </div>
 
         <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {[...students, { name: "Tizimdan chiqish", logout: true }].map(
-            (item, index) => (
+          {/* Home */}
+          <div
+            onClick={() => navigate("/student/default")}
+            className="flex cursor-pointer flex-col items-center rounded-xl bg-white p-6 text-center shadow-md transition duration-300 hover:shadow-lg"
+          >
+            <FaHome className="mb-3 text-4xl text-blue-600" />
+            <h3 className="text-lg font-semibold text-gray-800">Bosh sahifa</h3>
+          </div>
+
+          {/* Debts */}
+          <div
+            onClick={() => navigate("/student/debts")}
+            className="flex cursor-pointer flex-col items-center rounded-xl bg-white p-6 text-center shadow-md transition duration-300 hover:shadow-lg"
+          >
+            <FaFileInvoiceDollar className="mb-3 text-4xl text-red-500" />
+            <h3 className="text-lg font-semibold text-gray-800">
+              Qarzdorlik fanlar
+            </h3>
+          </div>
+          <div
+            onClick={() => navigate("/student/homework")}
+            className="flex cursor-pointer flex-col items-center rounded-xl bg-white p-6 text-center shadow-md transition duration-300 hover:shadow-lg"
+          >
+            <MdHomeWork className="mb-3 text-4xl text-lime-500" />
+            <h3 className="text-lg font-semibold text-gray-800">
+              Qo'shimcha vazifalar
+            </h3>
+          </div>
+          <div
+            onClick={() => navigate("/student/test-knowledge")}
+            className="flex cursor-pointer flex-col items-center rounded-xl bg-white p-6 text-center shadow-md transition duration-300 hover:shadow-lg"
+          >
+            <MdOutlineRule className="mb-3 text-4xl text-cyan-500" />
+            <h3 className="text-lg font-semibold text-gray-800">
+              Bilimni sinab ko'rish
+            </h3>
+          </div>
+
+          {/* Appeals */}
+          {/* <div
+            onClick={() => navigate("/student/appeals")}
+            className="flex cursor-pointer flex-col items-center rounded-xl bg-white p-6 text-center shadow-md transition duration-300 hover:shadow-lg"
+          >
+            <FaListUl className="mb-3 text-4xl text-green-600" />
+            <h3 className="text-lg font-semibold text-gray-800">
+              Ariza topshirish
+            </h3>
+          </div> */}
+
+          {/* My Appeal */}
+          {/* <div
+            onClick={() => navigate("/student/myappeal")}
+            className="flex cursor-pointer flex-col items-center rounded-xl bg-white p-6 text-center shadow-md transition duration-300 hover:shadow-lg"
+          >
+            <FaRegFileAlt className="mb-3 text-4xl text-yellow-500" />
+            <h3 className="text-lg font-semibold text-gray-800">
+              Mening arizalarim
+            </h3>
+          </div> */}
+          {/* additional homework */}
+
+          <div
+            onClick={() => navigate("/student/amaliyot")}
+            className="flex cursor-pointer flex-col items-center rounded-xl bg-white p-6 text-center shadow-md transition duration-300 hover:shadow-lg"
+          >
+            <FaTasks className="mb-3 text-4xl text-green-500" />
+            <h3 className="text-lg font-semibold text-gray-800">Amaliyot</h3>
+          </div>
+          <div
+            onClick={() => navigate("/student/score")}
+            className="flex cursor-pointer flex-col items-center rounded-xl bg-white p-6 text-center shadow-md transition duration-300 hover:shadow-lg"
+          >
+            <MdScore className="mb-3 text-4xl text-teal-500" />
+            <h3 className="text-lg font-semibold text-gray-800">
+              Yakuniy baholar
+            </h3>
+          </div>
+          {/* Shaxsiy ma'lumotlar */}
+          <div
+            onClick={() => navigate("/student/cabinet")}
+            className="flex cursor-pointer flex-col items-center rounded-xl bg-white p-6 text-center shadow-md transition duration-300 hover:shadow-lg"
+          >
+            <MdAccountCircle className="mb-3 text-4xl text-purple-600" />
+            <h3 className="text-base font-semibold text-gray-800">
+              Shaxsiy ma'lumotlar
+            </h3>
+          </div>
+          {/* chiqish */}
+          <div
+            onClick={() => navigate("/student/login")}
+            className="flex cursor-pointer flex-col items-center rounded-xl bg-white p-6 text-center shadow-md transition duration-300 hover:shadow-lg"
+          >
+            <MdLogout className="mb-3 text-4xl text-red-600" />
+            <h3 className="text-lg font-semibold text-gray-800">
+              Tizimdan chiqish
+            </h3>
+          </div>
+        </div>
+        <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {student.isOnline === true && (
+            <>
+              {/* Attendance */}
               <div
-                key={index}
-                onClick={() => {
-                  if (item.logout) {
-                    const weeklyConfirmDate =
-                      localStorage.getItem("weeklyConfirmDate");
-
-                    localStorage.clear();
-
-                    if (weeklyConfirmDate) {
-                      localStorage.setItem(
-                        "weeklyConfirmDate",
-                        weeklyConfirmDate
-                      );
-                    }
-
-                    window.location.href = "/student/login";
-                  } else {
-                    navigate(`${item.layout}/${item.path}`);
-                  }
-                }}
-                className={`flex cursor-pointer flex-col items-center rounded-xl p-6 shadow-md transition hover:shadow-lg ${
-                  item.logout ? "bg-white" : "bg-white"
-                }`}
+                onClick={() => navigate("/student/attendance")}
+                className="flex cursor-pointer flex-col items-center rounded-xl bg-white p-6 text-center shadow-md transition duration-300 hover:shadow-lg"
               >
-                <div
-                  className={`mb-3 ${
-                    item.logout ? "text-4xl text-red-600" : "text-blue-600"
-                  }`}
-                >
-                  {item.logout ? (
-                    <MdLogout className="text-4xl" />
-                  ) : (
-                    React.cloneElement(item.icon, {
-                      className: "h-10 w-10",
-                    })
-                  )}
-                </div>
-
-                <p
-                  className={`text-base font-semibold ${
-                    item.logout ? "text-red-600" : "text-gray-800"
-                  }`}
-                >
-                  {item.name}
-                </p>
+                <MdArticle className="mb-3 text-4xl text-navy-600" />
+                <h3 className="text-lg font-semibold text-gray-800">Davomat</h3>
               </div>
-            )
+
+              {/* Subject */}
+              <div
+                onClick={() => navigate("/student/subject")}
+                className="flex cursor-pointer flex-col items-center rounded-xl bg-white p-6 text-center shadow-md transition duration-300 hover:shadow-lg"
+              >
+                <MdPlayLesson className="mb-3 text-4xl text-orange-500" />
+                <h3 className="text-lg font-semibold text-gray-800">Fan</h3>
+              </div>
+
+              {/* bilim */}
+              <div
+                onClick={() => navigate("/student/test-knowledge")}
+                className="flex cursor-pointer flex-col items-center rounded-xl bg-white p-6 text-center shadow-md transition duration-300 hover:shadow-lg"
+              >
+                <MdOutlineRule className="text-stone-500 mb-3 text-4xl" />
+                <h3 className="text-lg font-semibold text-gray-800">
+                  Bilimni sinab ko'rish
+                </h3>
+              </div>
+
+              {/* Media-lesson */}
+              <div
+                onClick={() => navigate("/student/media-lessons")}
+                className="flex cursor-pointer flex-col items-center rounded-xl bg-white p-6 text-center shadow-md transition duration-300 hover:shadow-lg"
+              >
+                <MdOndemandVideo className="mb-3 text-4xl text-cyan-600" />
+                <h3 className="text-lg font-semibold text-gray-800">
+                  Video darslar
+                </h3>
+              </div>
+            </>
           )}
+          {/* magistr */}
+          {student?.level === "1-kurs" &&
+            student?.educationType === "Magistr" && (
+              <div
+                onClick={() => navigate("/student/magistr")}
+                className="flex cursor-pointer flex-col items-center rounded-xl bg-white p-6 text-center shadow-md transition duration-300 hover:shadow-lg"
+              >
+                <MdBook className="mb-3 text-4xl text-teal-600" />
+                <h3 className="text-base font-semibold text-gray-800">
+                  Desertatsiya mavzusi
+                </h3>
+              </div>
+            )}
         </div>
       </div>
 
@@ -528,7 +635,7 @@ ${student?.groupName} guruh talabasi ${student?.fullName} tomonidan`;
       )}
 
       {modalOpen && (
-        <div className="bg-black fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-opacity-50 pt-28">
+        <div className="bg-black fixed inset-0 z-50 flex items-center justify-center bg-opacity-50">
           <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl">
             <h2 className="mb-4 text-xl font-bold">
               📥 {kafolat ? "Kafolat xatini yangilash" : "Kafolat xati yuklash"}
@@ -537,7 +644,7 @@ ${student?.groupName} guruh talabasi ${student?.fullName} tomonidan`;
             {/* Kafolat xati matni */}
             <div className="mb-4 whitespace-pre-line rounded-lg border bg-gray-50 p-3 text-sm text-gray-800">
               <div className="flex justify-end">
-                <p className="w-2/3 md:w-1/2">{text1}</p>
+                <p className="w-1/2">{text1}</p>
               </div>
               <p className="text-center">Kafolat xati</p>
               <p className="whitespace-pre-line indent-[2rem]">{text2}</p>

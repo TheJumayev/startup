@@ -1,19 +1,67 @@
 /* eslint-disable */
-
+import React from "react";
+import { Link, useLocation, matchPath } from "react-router-dom";
 import { HiX } from "react-icons/hi";
-import Links from "./components/Links";
 
 import routes from "../../../routes/superadmin";
-import { Link } from "react-router-dom";
-import React from "react";
 
 const Sidebar = ({ open, onClose }) => {
+  const location = useLocation();
+
+  // Active route tekshirish
+  const activeRoute = (fullPath) => {
+    return matchPath({ path: fullPath, end: false }, location.pathname);
+  };
+
+  // Linklarni render qilish
+  const createLinks = (routes) => {
+    return routes.map((route, index) => {
+      if (route.layout === "/superadmin" && !route.hidden) {
+        const fullPath = route.layout + "/" + route.path;
+
+        return (
+          <Link key={index} to={fullPath}>
+            <div className="relative mb-3 flex hover:cursor-pointer">
+              <li className="flex cursor-pointer items-center px-8">
+                <span
+                  className={`${
+                    activeRoute(fullPath)
+                      ? "font-bold text-brand-500 dark:text-white"
+                      : "font-medium text-gray-600"
+                  }`}
+                >
+                  {route.icon ? route.icon : <DashIcon />}
+                </span>
+
+                <p
+                  className={`leading-1 ml-4 flex ${
+                    activeRoute(fullPath)
+                      ? "font-bold text-navy-700 dark:text-white"
+                      : "font-medium text-gray-600"
+                  }`}
+                >
+                  {route.name}
+                </p>
+              </li>
+
+              {activeRoute(fullPath) && (
+                <div className="absolute right-0 top-px h-9 w-1 rounded-lg bg-brand-500 dark:bg-brand-400" />
+              )}
+            </div>
+          </Link>
+        );
+      }
+      return null;
+    });
+  };
+
   return (
     <div
-      className={`sm:none duration-175 linear fixed !z-50 flex min-h-full flex-col bg-white pb-10 shadow-2xl shadow-white/5 transition-all dark:!bg-navy-800 dark:text-white md:!z-50 lg:!z-50 xl:!z-0 ${
+      className={`fixed !z-50 flex min-h-full flex-col bg-white pb-10 shadow-2xl transition-all dark:!bg-navy-800 dark:text-white ${
         open ? "translate-x-0" : "-translate-x-96"
       }`}
     >
+      {/* CLOSE BUTTON */}
       <span
         className="absolute top-4 right-4 block cursor-pointer xl:hidden"
         onClick={onClose}
@@ -21,44 +69,34 @@ const Sidebar = ({ open, onClose }) => {
         <HiX />
       </span>
 
-      <div className={`mx-[20px] mt-[20px] flex items-center`}>
+      {/* LOGO */}
+      <div className="mx-[20px] mt-[20px] flex items-center">
         <div className="mt-1 ml-1 h-2.5 font-poppins text-[26px] font-bold uppercase text-navy-700 dark:text-white">
           EDU.BXU.UZ
         </div>
       </div>
-      <div class="mt-[58px] mb-7 h-px bg-gray-300 dark:bg-white/30" />
-      {/* Nav item */}
 
+      <div className="mt-[58px] mb-7 h-px bg-gray-300 dark:bg-white/30" />
+
+      {/* MENU */}
       <div className="h-screen pb-36">
-        <ul className="mb-auto h-full scroll-m-0 overflow-auto overscroll-y-auto  pb-20">
-          <Links routes={routes.filter((route) => !route.hidden)} />
+        <ul className="mb-auto h-full overflow-auto pb-20">
+          {createLinks(routes)}
 
-          <Link to={"/"} className={"mt-20"}>
-            <div className="relative mb-3 flex hover:cursor-pointer">
-              <li className="my-[3px] flex cursor-pointer items-center px-8">
-                <span className={"font-medium text-gray-600"}></span>
-                <p
-                  className={`leading-1 ml-4 flex font-medium text-gray-600`}
-                ></p>
-                <p
-                  onClick={() => {
-                    localStorage.clear();
-                    window.location.href = "/admin/login"; // сброс
-                  }}
-                  className="leading-1 ml-2 w-full cursor-pointer rounded-md p-2 text-sm font-medium text-red-600 hover:bg-gray-100 dark:text-white"
-                >
-                  Tizimdan chiqish
-                </p>
-              </li>
-            </div>
-          </Link>
+          {/* LOGOUT */}
+          <li className="mt-20 px-8">
+            <p
+              onClick={() => {
+                localStorage.clear();
+                window.location.href = "/admin/login";
+              }}
+              className="cursor-pointer rounded-md p-2 text-sm font-medium text-red-600 hover:bg-gray-100 dark:text-white"
+            >
+              Tizimdan chiqish
+            </p>
+          </li>
         </ul>
       </div>
-
-      {/* Free Horizon Card */}
-      <div className="flex justify-center"></div>
-
-      {/* Nav item end */}
     </div>
   );
 };

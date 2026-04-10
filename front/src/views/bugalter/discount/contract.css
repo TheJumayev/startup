@@ -1,0 +1,16 @@
+.contract-a4 {
+  width: 794px;
+  min-height: 1123px;
+  padding: 10px 15px;
+  background: white;
+  font-size: 10px;
+  line-height: 1.1;
+  font-family: "Times New Roman", serif;
+  color: #000;
+  box-sizing: border-box;
+}
+
+#contract-pdf {
+  position: relative; /* MUHIM! fixed yoki absolute bo‘lmasin */
+  opacity: 1; /* Bu ishlaydi, chunki butun div oshkor emas, faqat ichidagi */
+}

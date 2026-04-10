@@ -28,9 +28,28 @@ public class AutoRun implements CommandLineRunner {
         if (roleRepo.findAll().isEmpty()) {
             saveRoles();
         }
+        List<Role> all = roleRepo.findAll();
+        if(all.size() ==9){
+            UserRoles roleBugalter = UserRoles.ROLE_BUGALTER;
+            Role role = new Role(10, roleBugalter);
+            roleRepo.saveAll(List.of(role));
+        }
 
-
-
+        if(all.size() ==8){
+            UserRoles roleBugalter = UserRoles.ROLE_SECRETARY;
+            Role role = new Role(8, roleBugalter);
+            roleRepo.saveAll(List.of(role));
+        }
+        if(all.size() ==9){
+            UserRoles roleBugalter = UserRoles.ROLE_TEST_CENTER;
+            Role role = new Role(9, roleBugalter);
+            roleRepo.saveAll(List.of(role));
+        }
+       if(all.size() ==10){
+           UserRoles roleBugalter = UserRoles.ROLE_OFFICE;
+           Role role = new Role(11, roleBugalter);
+           roleRepo.saveAll(List.of(role));
+       }
         if (weekDayRepo.findAll().isEmpty()) {
             List<WeekDays> days = List.of(
                     new WeekDays(1, "DUSHANBA"),
@@ -65,38 +84,27 @@ public class AutoRun implements CommandLineRunner {
 
     private void checkAndCreateUser(String phone, String password, String name, UserRoles role) {
         Optional<User> userByPhone = userRepo.findByPhone(phone);
-
         if (userByPhone.isEmpty()) {
-
-            Role roleEntity = roleRepo.findByName(role);
-
-            if (roleEntity == null) {
-                throw new RuntimeException("Role topilmadi: " + role);
-            }
-
             User user = User.builder()
                     .phone(phone)
-                    .name(name)
+                    .name(name)  // Storing the user's name
                     .password(passwordEncoder.encode(password))
-                    .roles(List.of(roleEntity))
+                    .roles(List.of(roleRepo.findByName(role)))
                     .build();
-
             userRepo.save(user);
         }
     }
+
     private List<Role> saveRoles() {
         return roleRepo.saveAll(List.of(
-                new Role(UserRoles.ROLE_ADMIN),
-                new Role(UserRoles.ROLE_STUDENT),
-                new Role(UserRoles.ROLE_REKTOR),
-                new Role(UserRoles.ROLE_TEACHER),
-                new Role(UserRoles.ROLE_SUPERADMIN),
-                new Role(UserRoles.ROLE_USER),
-                new Role(UserRoles.ROLE_DEKAN),
-                new Role(UserRoles.ROLE_SECRETARY),
-                new Role(UserRoles.ROLE_TEST_CENTER),
-                new Role(UserRoles.ROLE_BUGALTER),
-                new Role(UserRoles.ROLE_OFFICE)
+                new Role(1, UserRoles.ROLE_ADMIN),
+                new Role(2, UserRoles.ROLE_STUDENT),
+                new Role(3, UserRoles.ROLE_REKTOR),
+                new Role(4, UserRoles.ROLE_TEACHER),
+                new Role(5, UserRoles.ROLE_SUPERADMIN),
+                new Role(6, UserRoles.ROLE_USER),
+                new Role(7, UserRoles.ROLE_DEKAN),
+                new Role(8, UserRoles.ROLE_SECRETARY)
         ));
     }
 

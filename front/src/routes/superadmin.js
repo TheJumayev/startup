@@ -2,6 +2,8 @@ import MainDashboardSuper from "views/superadmin/default";
 import SuperAdminProfile from "views/superadmin/profile";
 import Groups from "views/superadmin/groups";
 import Subjects from "views/superadmin/subjects";
+import OquvReja from "views/superadmin/oquv-reja";
+import Students from "views/superadmin/students";
 import Curriculum from "views/superadmin/curriculum";
 
 import {
@@ -36,11 +38,11 @@ const routes = [
     component: <Subjects />,
   },
   {
-    name: "O'quv dasturlari",
+    name: "O'quv reja",
     layout: "/superadmin",
-    path: "curriculum",
+    path: "oquv-reja",
     icon: <MdSchool className="h-6 w-6" />,
-    component: <Curriculum />,
+    component: <OquvReja />,
   },
 
   {

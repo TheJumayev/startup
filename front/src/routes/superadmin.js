@@ -3,7 +3,6 @@ import SuperAdminProfile from "views/superadmin/profile";
 import Groups from "views/superadmin/groups";
 import Subjects from "views/superadmin/subjects";
 import Curriculum from "views/superadmin/curriculum";
-import Students from "views/superadmin/students";
 
 import {
   MdHome,
@@ -43,13 +42,7 @@ const routes = [
     icon: <MdSchool className="h-6 w-6" />,
     component: <Curriculum />,
   },
-  {
-    name: "Talabalar",
-    layout: "/superadmin",
-    path: "students",
-    icon: <MdPeople className="h-6 w-6" />,
-    component: <Students />,
-  },
+
   {
     name: "Profile",
     layout: "/superadmin",

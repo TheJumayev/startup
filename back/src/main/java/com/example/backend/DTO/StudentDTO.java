@@ -13,6 +13,7 @@ import java.util.UUID;
 public class StudentDTO {
     private UUID id;
     private String fullName;
+    private String login;
     private UUID groupsId;
     private LocalDate createAt;
 }

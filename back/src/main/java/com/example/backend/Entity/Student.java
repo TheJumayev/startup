@@ -20,6 +20,10 @@ public class Student {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
     private String fullName;
+    @Column(unique = true, nullable = false)
+    private String login;
+    @Column(nullable = false)
+    private String password;
     @ManyToOne
     private Groups groups;
     private LocalDate createAt;

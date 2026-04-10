@@ -1,11 +1,13 @@
 package com.example.backend.Controller;
 
-import com.example.backend.DTO.StudentDTO;
+import com.example.backend.DTO.*;
 import com.example.backend.Entity.Student;
 import com.example.backend.Repository.GroupsRepo;
 import com.example.backend.Repository.StudentRepo;
+import com.example.backend.Security.JwtServiceStudent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -20,21 +22,103 @@ public class StudentController {
 
     private final StudentRepo studentRepo;
     private final GroupsRepo groupsRepo;
+    private final JwtServiceStudent jwtServiceStudent;
+    private final PasswordEncoder passwordEncoder;
 
-    @PostMapping
-    public ResponseEntity<Student> create(@RequestBody StudentDTO dto) {
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@RequestBody StudentRegisterDTO dto) {
+        // Проверка, что пароли совпадают
+        if (!dto.getPassword().equals(dto.getPasswordConfirm())) {
+            return ResponseEntity.badRequest().body("Пароли не совпадают");
+        }
+
+        // Проверка, что логин не существует
+        if (studentRepo.findByLogin(dto.getLogin()).isPresent()) {
+            return ResponseEntity.badRequest().body("Логин уже занят");
+        }
+
+        // Проверка, что fullName не пустое
+        if (dto.getFullName() == null || dto.getFullName().isEmpty()) {
+            return ResponseEntity.badRequest().body("Полное имя не может быть пустым");
+        }
+
+        // Создание нового студента
         Student student = Student.builder()
                 .fullName(dto.getFullName())
+                .login(dto.getLogin())
+                .password(passwordEncoder.encode(dto.getPassword()))
+                .groups(dto.getGroupsId() != null ? groupsRepo.findById(dto.getGroupsId())
+                        .orElse(null) : null)
+                .createAt(LocalDate.now())
+                .build();
+
+        Student saved = studentRepo.save(student);
+
+        // Генерация токенов
+        String token = jwtServiceStudent.generateJwtToken(saved);
+        String refreshToken = jwtServiceStudent.generateJwtRefreshToken(saved);
+
+        StudentLoginResponseDTO response = new StudentLoginResponseDTO(
+                saved.getId(),
+                saved.getFullName(),
+                saved.getLogin(),
+                token,
+                refreshToken
+        );
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody StudentLoginDTO dto) {
+        // Поиск студента по логину
+        var student = studentRepo.findByLogin(dto.getLogin());
+
+        if (student.isEmpty()) {
+            return ResponseEntity.badRequest().body("Неверный логин или пароль");
+        }
+
+        Student s = student.get();
+
+        // Проверка пароля
+        if (!passwordEncoder.matches(dto.getPassword(), s.getPassword())) {
+            return ResponseEntity.badRequest().body("Неверный логин или пароль");
+        }
+
+        // Генерация токенов
+        String token = jwtServiceStudent.generateJwtToken(s);
+        String refreshToken = jwtServiceStudent.generateJwtRefreshToken(s);
+
+        StudentLoginResponseDTO response = new StudentLoginResponseDTO(
+                s.getId(),
+                s.getFullName(),
+                s.getLogin(),
+                token,
+                refreshToken
+        );
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping
+    public ResponseEntity<StudentDTO> create(@RequestBody StudentDTO dto) {
+        Student student = Student.builder()
+                .fullName(dto.getFullName())
+                .login(dto.getLogin())
+                .password(passwordEncoder.encode(UUID.randomUUID().toString()))
                 .groups(dto.getGroupsId() != null ? groupsRepo.findById(dto.getGroupsId())
                         .orElseThrow(() -> new RuntimeException("Group not found")) : null)
                 .createAt(dto.getCreateAt() != null ? dto.getCreateAt() : LocalDate.now())
                 .build();
 
-        return ResponseEntity.ok(studentRepo.save(student));
+        Student saved = studentRepo.save(student);
+        StudentDTO result = new StudentDTO(saved.getId(), saved.getFullName(), saved.getLogin(),
+                saved.getGroups() != null ? saved.getGroups().getId() : null, saved.getCreateAt());
+        return ResponseEntity.ok(result);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Student> update(
+    public ResponseEntity<StudentDTO> update(
             @PathVariable UUID id,
             @RequestBody StudentDTO dto
     ) {
@@ -54,19 +138,29 @@ public class StudentController {
             student.setCreateAt(dto.getCreateAt());
         }
 
-        return ResponseEntity.ok(studentRepo.save(student));
+        Student updated = studentRepo.save(student);
+        StudentDTO result = new StudentDTO(updated.getId(), updated.getFullName(), updated.getLogin(),
+                updated.getGroups() != null ? updated.getGroups().getId() : null, updated.getCreateAt());
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Student> getById(@PathVariable UUID id) {
+    public ResponseEntity<StudentDTO> getById(@PathVariable UUID id) {
         Student student = studentRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Student not found with id: " + id));
-        return ResponseEntity.ok(student);
+        StudentDTO result = new StudentDTO(student.getId(), student.getFullName(), student.getLogin(),
+                student.getGroups() != null ? student.getGroups().getId() : null, student.getCreateAt());
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping
-    public ResponseEntity<List<Student>> getAll() {
-        return ResponseEntity.ok(studentRepo.findAll());
+    public ResponseEntity<List<StudentDTO>> getAll() {
+        List<Student> students = studentRepo.findAll();
+        List<StudentDTO> dtos = students.stream()
+                .map(s -> new StudentDTO(s.getId(), s.getFullName(), s.getLogin(),
+                        s.getGroups() != null ? s.getGroups().getId() : null, s.getCreateAt()))
+                .toList();
+        return ResponseEntity.ok(dtos);
     }
 
     @DeleteMapping("/{id}")
@@ -78,4 +172,6 @@ public class StudentController {
         return ResponseEntity.noContent().build();
     }
 }
+
+
 

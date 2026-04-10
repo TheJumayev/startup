@@ -20,20 +20,18 @@ public class SubjectsController {
     private final SubjectsRepo subjectsRepo;
 
     @PostMapping
-    public ResponseEntity<SubjectsDTO> create(@RequestBody SubjectsDTO dto) {
+    public ResponseEntity<Subjects> create(@RequestBody SubjectsDTO dto) {
         Subjects subject = Subjects.builder()
                 .name(dto.getName())
                 .description(dto.getDescription())
                 .createAt(dto.getCreateAt() != null ? dto.getCreateAt() : LocalDate.now())
                 .build();
 
-        Subjects saved = subjectsRepo.save(subject);
-        SubjectsDTO result = new SubjectsDTO(saved.getId(), saved.getName(), saved.getDescription(), saved.getCreateAt());
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(subjectsRepo.save(subject));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<SubjectsDTO> update(
+    public ResponseEntity<Subjects> update(
             @PathVariable UUID id,
             @RequestBody SubjectsDTO dto
     ) {
@@ -52,26 +50,19 @@ public class SubjectsController {
             subject.setCreateAt(dto.getCreateAt());
         }
 
-        Subjects updated = subjectsRepo.save(subject);
-        SubjectsDTO result = new SubjectsDTO(updated.getId(), updated.getName(), updated.getDescription(), updated.getCreateAt());
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(subjectsRepo.save(subject));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<SubjectsDTO> getById(@PathVariable UUID id) {
+    public ResponseEntity<Subjects> getById(@PathVariable UUID id) {
         Subjects subject = subjectsRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Subject not found with id: " + id));
-        SubjectsDTO result = new SubjectsDTO(subject.getId(), subject.getName(), subject.getDescription(), subject.getCreateAt());
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(subject);
     }
 
     @GetMapping
-    public ResponseEntity<List<SubjectsDTO>> getAll() {
-        List<Subjects> subjects = subjectsRepo.findAll();
-        List<SubjectsDTO> dtos = subjects.stream()
-                .map(s -> new SubjectsDTO(s.getId(), s.getName(), s.getDescription(), s.getCreateAt()))
-                .toList();
-        return ResponseEntity.ok(dtos);
+    public ResponseEntity<List<Subjects>> getAll() {
+        return ResponseEntity.ok(subjectsRepo.findAll());
     }
 
     @DeleteMapping("/{id}")

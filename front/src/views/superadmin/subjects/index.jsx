@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import ApiCall from "../../../config";
-import { MdAdd, MdEdit, MdDelete, MdSearch } from "react-icons/md";
+import { MdAdd, MdEdit, MdDelete, MdSearch, MdClose } from "react-icons/md";
 import Card from "components/card";
+import Select from "react-select";
 
 const Subjects = () => {
   const [subjects, setSubjects] = useState([]);
+  const [curriculums, setCurriculums] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showForm, setShowForm] = useState(false);
@@ -14,10 +16,12 @@ const Subjects = () => {
     name: "",
     code: "",
     description: "",
+    curriculumId: "",
   });
 
   useEffect(() => {
     fetchSubjects();
+    fetchCurriculums();
   }, []);
 
   const fetchSubjects = async () => {
@@ -34,6 +38,15 @@ const Subjects = () => {
     }
   };
 
+  const fetchCurriculums = async () => {
+    try {
+      const response = await ApiCall("/api/v1/curriculums", "GET", null);
+      setCurriculums(response.data || []);
+    } catch (err) {
+      console.error("Error fetching curriculums:", err);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -43,7 +56,7 @@ const Subjects = () => {
       } else {
         await ApiCall("/api/v1/subjects", "POST", formData);
       }
-      setFormData({ name: "", code: "", description: "" });
+      setFormData({ name: "", code: "", description: "", curriculumId: "" });
       setEditingId(null);
       setShowForm(false);
       fetchSubjects();
@@ -60,6 +73,7 @@ const Subjects = () => {
       name: subject.name,
       code: subject.code,
       description: subject.description,
+      curriculumId: subject.curriculumId,
     });
     setEditingId(subject.id);
     setShowForm(true);
@@ -81,7 +95,7 @@ const Subjects = () => {
   };
 
   const filteredSubjects = subjects.filter((subject) =>
-    subject.name.toLowerCase().includes(searchTerm.toLowerCase())
+    (subject.name?.toLowerCase() || "").includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -95,7 +109,7 @@ const Subjects = () => {
           </div>
           <button
             onClick={() => {
-              setFormData({ name: "", code: "", description: "" });
+              setFormData({ name: "", code: "", description: "", curriculumId: "" });
               setEditingId(null);
               setShowForm(!showForm);
             }}
@@ -112,62 +126,109 @@ const Subjects = () => {
           </div>
         )}
 
+        {/* Modal */}
         {showForm && (
-          <form onSubmit={handleSubmit} className="mb-6 space-y-4 rounded-lg bg-gray-50 p-4 dark:bg-gray-800">
-            <div>
-              <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Fan nomi
-              </label>
-              <input
-                type="text"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                required
-                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                placeholder="Fan nomi kiriting"
-              />
-            </div>
-            <div>
-              <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Kod
-              </label>
-              <input
-                type="text"
-                value={formData.code}
-                onChange={(e) => setFormData({ ...formData, code: e.target.value })}
-                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                placeholder="Fan kodi kiriting"
-              />
-            </div>
-            <div>
-              <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Tavsif
-              </label>
-              <textarea
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                placeholder="Tavsif kiriting"
-                rows="3"
-              />
-            </div>
-            <div className="flex gap-2">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+            <div className="relative w-full max-w-md rounded-lg bg-white p-6 shadow-xl dark:bg-gray-800">
               <button
-                type="submit"
-                disabled={loading}
-                className="rounded-lg bg-green-600 px-4 py-2 text-white hover:bg-green-700 disabled:opacity-50"
-              >
-                {loading ? "Saqlanmoqda..." : "Saqlash"}
-              </button>
-              <button
-                type="button"
                 onClick={() => setShowForm(false)}
-                className="rounded-lg bg-gray-400 px-4 py-2 text-white hover:bg-gray-500"
+                className="absolute right-4 top-4 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
               >
-                Bekor qilish
+                <MdClose className="h-6 w-6" />
               </button>
+
+              <h2 className="mb-4 text-xl font-bold text-gray-900 dark:text-white">
+                {editingId ? "Fanni tahrirlash" : "Yangi fan yaratish"}
+              </h2>
+
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Fan nomi
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    required
+                    className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                    placeholder="Fan nomi kiriting"
+                  />
+                </div>
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Kod
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.code}
+                    onChange={(e) => setFormData({ ...formData, code: e.target.value })}
+                    className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                    placeholder="Fan kodi kiriting"
+                  />
+                </div>
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Tavsif
+                  </label>
+                  <textarea
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                    placeholder="Tavsif kiriting"
+                    rows="3"
+                  />
+                </div>
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    O'quv dasturi
+                  </label>
+                  <Select
+                    options={curriculums.map((curriculum) => ({
+                      value: curriculum.id,
+                      label: curriculum.name,
+                    }))}
+                    value={formData.curriculumId ? { value: formData.curriculumId, label: curriculums.find(c => c.id === formData.curriculumId)?.name } : null}
+                    onChange={(option) => setFormData({ ...formData, curriculumId: option?.value || "" })}
+                    isClearable
+                    isSearchable
+                    placeholder="O'quv dasturini tanlang..."
+                    classNamePrefix="react-select"
+                    styles={{
+                      control: (base) => ({
+                        ...base,
+                        borderColor: "#d1d5db",
+                        backgroundColor: "#ffffff",
+                        color: "#111827",
+                        minHeight: "40px",
+                      }),
+                      option: (base, state) => ({
+                        ...base,
+                        backgroundColor: state.isSelected ? "#3b82f6" : "#ffffff",
+                        color: state.isSelected ? "#ffffff" : "#111827",
+                      }),
+                    }}
+                  />
+                </div>
+                <div className="flex gap-2 pt-4">
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="flex-1 rounded-lg bg-green-600 px-4 py-2 text-white hover:bg-green-700 disabled:opacity-50"
+                  >
+                    {loading ? "Saqlanmoqda..." : "Saqlash"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowForm(false)}
+                    className="flex-1 rounded-lg bg-gray-400 px-4 py-2 text-white hover:bg-gray-500"
+                  >
+                    Bekor qilish
+                  </button>
+                </div>
+              </form>
             </div>
-          </form>
+          </div>
         )}
 
         <div className="mb-4">
@@ -202,10 +263,13 @@ const Subjects = () => {
                   Kod
                 </th>
                 <th className="border border-gray-300 px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:border-gray-600 dark:text-white">
-                  Tavsif
+                   Tavsif
                 </th>
                 <th className="border border-gray-300 px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:border-gray-600 dark:text-white">
-                  Harakatlari
+                   O'quv dasturi
+                </th>
+                <th className="border border-gray-300 px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:border-gray-600 dark:text-white">
+                   Harakatlari
                 </th>
               </tr>
             </thead>
@@ -220,6 +284,9 @@ const Subjects = () => {
                   </td>
                   <td className="border border-gray-300 px-4 py-3 text-gray-600 dark:border-gray-600 dark:text-gray-400">
                     {subject.description}
+                  </td>
+                  <td className="border border-gray-300 px-4 py-3 text-gray-600 dark:border-gray-600 dark:text-gray-400">
+                    {curriculums.find(c => c.id === subject.curriculumId)?.name || "—"}
                   </td>
                   <td className="border border-gray-300 px-4 py-3">
                     <div className="flex gap-2">

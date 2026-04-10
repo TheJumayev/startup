@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import ApiCall from "../../../config";
-import { MdAdd, MdEdit, MdDelete, MdSearch } from "react-icons/md";
+import { MdAdd, MdEdit, MdDelete, MdSearch, MdClose } from "react-icons/md";
 import Card from "components/card";
 
 const Groups = () => {
@@ -76,7 +76,7 @@ const Groups = () => {
   };
 
   const filteredGroups = groups.filter((group) =>
-    group.name.toLowerCase().includes(searchTerm.toLowerCase())
+    (group.name?.toLowerCase() || "").includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -101,56 +101,72 @@ const Groups = () => {
           </button>
         </div>
 
-        {error && (
+         {error && (
           <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-red-600">
             {error}
           </div>
         )}
 
+        {/* Modal */}
         {showForm && (
-          <form onSubmit={handleSubmit} className="mb-6 space-y-4 rounded-lg bg-gray-50 p-4 dark:bg-gray-800">
-            <div>
-              <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Guruhi nomi
-              </label>
-              <input
-                type="text"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                required
-                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                placeholder="Guruhi nomi kiriting"
-              />
-            </div>
-            <div>
-              <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Tavsif
-              </label>
-              <textarea
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                placeholder="Tavsif kiriting"
-                rows="3"
-              />
-            </div>
-            <div className="flex gap-2">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+            <div className="relative w-full max-w-md rounded-lg bg-white p-6 shadow-xl dark:bg-gray-800">
               <button
-                type="submit"
-                disabled={loading}
-                className="rounded-lg bg-green-600 px-4 py-2 text-white hover:bg-green-700 disabled:opacity-50"
-              >
-                {loading ? "Saqlanmoqda..." : "Saqlash"}
-              </button>
-              <button
-                type="button"
                 onClick={() => setShowForm(false)}
-                className="rounded-lg bg-gray-400 px-4 py-2 text-white hover:bg-gray-500"
+                className="absolute right-4 top-4 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
               >
-                Bekor qilish
+                <MdClose className="h-6 w-6" />
               </button>
+
+              <h2 className="mb-4 text-xl font-bold text-gray-900 dark:text-white">
+                {editingId ? "Guruhni tahrirlash" : "Yangi guruhi yaratish"}
+              </h2>
+
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Guruhi nomi
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    required
+                    className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                    placeholder="Guruhi nomi kiriting"
+                  />
+                </div>
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Tavsif
+                  </label>
+                  <textarea
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                    placeholder="Tavsif kiriting"
+                    rows="3"
+                  />
+                </div>
+                <div className="flex gap-2 pt-4">
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="flex-1 rounded-lg bg-green-600 px-4 py-2 text-white hover:bg-green-700 disabled:opacity-50"
+                  >
+                    {loading ? "Saqlanmoqda..." : "Saqlash"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowForm(false)}
+                    className="flex-1 rounded-lg bg-gray-400 px-4 py-2 text-white hover:bg-gray-500"
+                  >
+                    Bekor qilish
+                  </button>
+                </div>
+              </form>
             </div>
-          </form>
+          </div>
         )}
 
         <div className="mb-4">

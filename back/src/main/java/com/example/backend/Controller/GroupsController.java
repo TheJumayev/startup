@@ -20,7 +20,7 @@ public class GroupsController {
     private final GroupsRepo groupsRepo;
 
     @PostMapping
-    public ResponseEntity<Groups> create(@RequestBody GroupsDTO dto) {
+    public ResponseEntity<GroupsDTO> create(@RequestBody GroupsDTO dto) {
         Groups groups = Groups.builder()
                 .name(dto.getName())
                 .description(dto.getDescription())
@@ -28,11 +28,13 @@ public class GroupsController {
                 .createdAt(dto.getCreatedAt() != null ? dto.getCreatedAt() : LocalDateTime.now())
                 .build();
 
-        return ResponseEntity.ok(groupsRepo.save(groups));
+        Groups saved = groupsRepo.save(groups);
+        GroupsDTO result = new GroupsDTO(saved.getId(), saved.getName(), saved.getDescription(), saved.getSemesterName(), saved.getCreatedAt());
+        return ResponseEntity.ok(result);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Groups> update(
+    public ResponseEntity<GroupsDTO> update(
             @PathVariable UUID id,
             @RequestBody GroupsDTO dto
     ) {
@@ -55,19 +57,26 @@ public class GroupsController {
             groups.setCreatedAt(dto.getCreatedAt());
         }
 
-        return ResponseEntity.ok(groupsRepo.save(groups));
+        Groups updated = groupsRepo.save(groups);
+        GroupsDTO result = new GroupsDTO(updated.getId(), updated.getName(), updated.getDescription(), updated.getSemesterName(), updated.getCreatedAt());
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Groups> getById(@PathVariable UUID id) {
+    public ResponseEntity<GroupsDTO> getById(@PathVariable UUID id) {
         Groups groups = groupsRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Group not found with id: " + id));
-        return ResponseEntity.ok(groups);
+        GroupsDTO result = new GroupsDTO(groups.getId(), groups.getName(), groups.getDescription(), groups.getSemesterName(), groups.getCreatedAt());
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping
-    public ResponseEntity<List<Groups>> getAll() {
-        return ResponseEntity.ok(groupsRepo.findAll());
+    public ResponseEntity<List<GroupsDTO>> getAll() {
+        List<Groups> groups = groupsRepo.findAll();
+        List<GroupsDTO> dtos = groups.stream()
+                .map(g -> new GroupsDTO(g.getId(), g.getName(), g.getDescription(), g.getSemesterName(), g.getCreatedAt()))
+                .toList();
+        return ResponseEntity.ok(dtos);
     }
 
     @DeleteMapping("/{id}")

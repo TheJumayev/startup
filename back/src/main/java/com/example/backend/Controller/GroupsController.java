@@ -77,6 +77,8 @@ public class GroupsController {
         }
         groupsRepo.deleteById(id);
         return ResponseEntity.noContent().build();
+
+
     }
 }
 

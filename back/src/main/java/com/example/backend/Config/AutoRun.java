@@ -1,8 +1,13 @@
 package com.example.backend.Config;
 
+import com.example.backend.Entity.Role;
+import com.example.backend.Entity.User;
+import com.example.backend.Entity.WeekDays;
 import com.example.backend.Entity.*;
 import com.example.backend.Enums.UserRoles;
-import com.example.backend.Repository.*;
+import com.example.backend.Repository.RoleRepo;
+import com.example.backend.Repository.UserRepo;
+import com.example.backend.Repository.WeekDayRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +19,7 @@ import java.util.Optional;
 @Configuration
 @RequiredArgsConstructor
 public class AutoRun implements CommandLineRunner {
+
     private final RoleRepo roleRepo;
     private final UserRepo userRepo;
     private final PasswordEncoder passwordEncoder;
@@ -32,6 +38,7 @@ public class AutoRun implements CommandLineRunner {
            roleRepo.saveAll(List.of(role));
        }
 
+        // ✅ 3. Пользователи
         checkAndCreateUser("admin", "00000000", "Default Admin", UserRoles.ROLE_ADMIN);
         checkAndCreateUser("user", "00000000", "USER DEF", UserRoles.ROLE_USER);
         checkAndCreateUser("superadmin", "00000000", "SUPER ADMIN", UserRoles.ROLE_SUPERADMIN);
@@ -41,6 +48,16 @@ public class AutoRun implements CommandLineRunner {
 
     }
 
+    // ✅ создание ролей безопасно
+    private void saveRoles() {
+        for (UserRoles roleEnum : UserRoles.values()) {
+            if (roleRepo.findByName(roleEnum) == null) {
+                Role role = new Role();
+                role.setName(roleEnum);
+                roleRepo.save(role);
+            }
+        }
+    }
 
     private void checkAndCreateUser(String phone, String password, String name, UserRoles role) {
         Optional<Role> byName = roleRepo.findByName(role);
@@ -51,13 +68,22 @@ public class AutoRun implements CommandLineRunner {
 
 
         Optional<User> userByPhone = userRepo.findByPhone(phone);
+
         if (userByPhone.isEmpty()) {
+
+            Role role = roleRepo.findByName(roleEnum);
+
+            if (role == null) {
+                throw new RuntimeException("ROLE NOT FOUND: " + roleEnum);
+            }
+
             User user = User.builder()
                     .phone(phone)
-                    .name(name)  // Storing the user's name
+                    .name(name)
                     .password(passwordEncoder.encode(password))
                     .roles(all)
                     .build();
+
             userRepo.save(user);
         }
     }

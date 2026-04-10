@@ -17,7 +17,7 @@ const routes = [
   },
 
   {
-    name: "Profile",
+    name: "Profil",
     layout: "/student",
     path: "profile",
     icon: <MdPerson className="h-6 w-6" />,

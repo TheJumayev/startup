@@ -4,6 +4,8 @@ import { MdAdd, MdEdit, MdDelete, MdSearch, MdClose } from "react-icons/md";
 
 const CurriculumModern = () => {
   const [curriculums, setCurriculums] = useState([]);
+  const [groups, setGroups] = useState([]);
+  const [subjects, setSubjects] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showForm, setShowForm] = useState(false);
@@ -11,13 +13,15 @@ const CurriculumModern = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [formData, setFormData] = useState({
     name: "",
-    code: "",
-    description: "",
     duration: "",
+    groupsId: "",
+    subjectsId: "",
   });
 
   useEffect(() => {
     fetchCurriculums();
+    fetchGroups();
+    fetchSubjects();
   }, []);
 
   const fetchCurriculums = async () => {
@@ -36,6 +40,28 @@ const CurriculumModern = () => {
     }
   };
 
+  const fetchGroups = async () => {
+    try {
+      const response = await ApiCall("/api/v1/groups", "GET", null);
+      const data = response.data || [];
+      setGroups(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error("Error fetching groups:", err);
+      setGroups([]);
+    }
+  };
+
+  const fetchSubjects = async () => {
+    try {
+      const response = await ApiCall("/api/v1/subjects", "GET", null);
+      const data = response.data || [];
+      setSubjects(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error("Error fetching subjects:", err);
+      setSubjects([]);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -45,7 +71,7 @@ const CurriculumModern = () => {
       } else {
         await ApiCall("/api/v1/curriculums", "POST", formData);
       }
-      setFormData({ name: "", code: "", description: "", duration: "" });
+      setFormData({ name: "", duration: "", groupsId: "", subjectsId: "" });
       setEditingId(null);
       setShowForm(false);
       fetchCurriculums();
@@ -60,9 +86,9 @@ const CurriculumModern = () => {
   const handleEdit = (curriculum) => {
     setFormData({
       name: curriculum.name,
-      code: curriculum.code,
-      description: curriculum.description,
       duration: curriculum.duration,
+      groupsId: curriculum.groupsId || "",
+      subjectsId: curriculum.subjectsId || "",
     });
     setEditingId(curriculum.id);
     setShowForm(true);
@@ -87,6 +113,9 @@ const CurriculumModern = () => {
     (curriculum.name?.toLowerCase() || "").includes(searchTerm.toLowerCase())
   );
 
+  const getGroupName = (id) => groups.find((g) => g.id === id)?.name || "—";
+  const getSubjectName = (id) => subjects.find((s) => s.id === id)?.name || "—";
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -101,7 +130,7 @@ const CurriculumModern = () => {
         </div>
         <button
           onClick={() => {
-            setFormData({ name: "", code: "", description: "", duration: "" });
+            setFormData({ name: "", duration: "", groupsId: "", subjectsId: "" });
             setEditingId(null);
             setShowForm(true);
           }}
@@ -133,7 +162,10 @@ const CurriculumModern = () => {
 
       {/* Modal */}
       {showForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setShowForm(false)}>
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+          onClick={() => setShowForm(false)}
+        >
           <div
             className="relative w-full max-h-[90vh] max-w-md space-y-6 overflow-y-auto rounded-2xl border border-gray-200 bg-white p-8 shadow-2xl dark:border-gray-700 dark:bg-gray-800"
             onClick={(e) => e.stopPropagation()}
@@ -150,6 +182,7 @@ const CurriculumModern = () => {
             </h2>
 
             <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Dastur nomi */}
               <div>
                 <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300">
                   Dastur nomi
@@ -164,43 +197,60 @@ const CurriculumModern = () => {
                 />
               </div>
 
-              <div>
-                <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                  Kod
-                </label>
-                <input
-                  type="text"
-                  value={formData.code}
-                  onChange={(e) => setFormData({ ...formData, code: e.target.value })}
-                  className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 transition-colors focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                  placeholder="Dastur kodi kiriting"
-                />
-              </div>
-
+              {/* Muddati (oylar) */}
               <div>
                 <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300">
                   Muddati (oylar)
                 </label>
                 <input
                   type="number"
+                  min="1"
                   value={formData.duration}
                   onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
+                  required
                   className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 transition-colors focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                  placeholder="Muddati oylar bilan kiriting"
+                  placeholder="Masalan: 12"
                 />
               </div>
 
+              {/* Guruh (select) */}
               <div>
                 <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                  Tavsif
+                  Guruh
                 </label>
-                <textarea
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                <select
+                  value={formData.groupsId}
+                  onChange={(e) => setFormData({ ...formData, groupsId: e.target.value })}
+                  required
                   className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 transition-colors focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                  placeholder="Tavsif kiriting"
-                  rows="3"
-                />
+                >
+                  <option value="">Guruh tanlang</option>
+                  {groups.map((g) => (
+                    <option key={g.id} value={g.id}>
+                      {g.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Fan (select) */}
+              <div>
+                <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300">
+                  Fan
+                </label>
+                <select
+                  value={formData.subjectsId}
+                  onChange={(e) => setFormData({ ...formData, subjectsId: e.target.value })}
+                  required
+                  className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 transition-colors focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                >
+                  <option value="">Fan tanlang</option>
+                  {subjects.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.name}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div className="flex gap-3 pt-4">
@@ -246,9 +296,10 @@ const CurriculumModern = () => {
                 <h3 className="text-lg font-bold text-gray-900 dark:text-white">
                   {curriculum.name}
                 </h3>
-                <div className="mt-3 flex items-center gap-4">
+                <div className="mt-3 space-y-2">
+                  {/* Muddati */}
                   <div className="flex items-center gap-2">
-                    <span className="text-2xl">⏱️</span>
+                    <span className="text-xl">⏱️</span>
                     <div>
                       <p className="text-xs text-gray-500 dark:text-gray-400">Muddati</p>
                       <p className="font-semibold text-gray-900 dark:text-white">
@@ -256,13 +307,30 @@ const CurriculumModern = () => {
                       </p>
                     </div>
                   </div>
+                  {/* Guruh */}
+                  <div className="flex items-center gap-2">
+                    <span className="text-xl">👥</span>
+                    <div>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Guruh</p>
+                      <p className="font-semibold text-gray-900 dark:text-white">
+                        {getGroupName(curriculum.groupsId)}
+                      </p>
+                    </div>
+                  </div>
+                  {/* Fan */}
+                  <div className="flex items-center gap-2">
+                    <span className="text-xl">📚</span>
+                    <div>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Fan</p>
+                      <p className="font-semibold text-gray-900 dark:text-white">
+                        {getSubjectName(curriculum.subjectsId)}
+                      </p>
+                    </div>
+                  </div>
                 </div>
-                <p className="mt-3 text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
-                  {curriculum.description || "Tavsif mavjud emas"}
-                </p>
               </div>
 
-              <div className="flex gap-2 pt-4 border-t border-gray-200 dark:border-gray-700">
+              <div className="flex gap-2 border-t border-gray-200 pt-4 dark:border-gray-700">
                 <button
                   onClick={() => handleEdit(curriculum)}
                   className="flex-1 inline-flex items-center justify-center gap-2 rounded-lg bg-blue-100 px-3 py-2 text-sm font-medium text-blue-600 transition-colors hover:bg-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-900/50"

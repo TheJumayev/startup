@@ -14,7 +14,16 @@ public class StudentDTO {
     private UUID id;
     private String fullName;
     private String login;
+    private String password;
     private UUID groupsId;
     private LocalDate createAt;
+
+    public StudentDTO(UUID id, String fullName, String login, UUID groupsId, LocalDate createAt) {
+        this.id = id;
+        this.fullName = fullName;
+        this.login = login;
+        this.groupsId = groupsId;
+        this.createAt = createAt;
+    }
 }
 

@@ -14,6 +14,7 @@ const GroupsModern = () => {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
+    semesterName: "",
   });
 
   useEffect(() => {
@@ -45,7 +46,7 @@ const GroupsModern = () => {
       } else {
         await ApiCall("/api/v1/groups", "POST", formData);
       }
-      setFormData({ name: "", description: "" });
+      setFormData({ name: "", description: "", semesterName: "" });
       setEditingId(null);
       setShowForm(false);
       fetchGroups();
@@ -58,7 +59,11 @@ const GroupsModern = () => {
   };
 
   const handleEdit = (group) => {
-    setFormData({ name: group.name, description: group.description });
+    setFormData({
+      name: group.name || "",
+      description: group.description || "",
+      semesterName: group.semesterName || "",
+    });
     setEditingId(group.id);
     setShowForm(true);
   };
@@ -96,7 +101,7 @@ const GroupsModern = () => {
         </div>
         <button
           onClick={() => {
-            setFormData({ name: "", description: "" });
+            setFormData({ name: "", description: "", semesterName: "" });
             setEditingId(null);
             setShowForm(true);
           }}
@@ -169,6 +174,19 @@ const GroupsModern = () => {
                   className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 transition-colors focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                   placeholder="Tavsif kiriting"
                   rows="3"
+                />
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300">
+                  Semestr nomi
+                </label>
+                <input
+                  type="text"
+                  value={formData.semesterName}
+                  onChange={(e) => setFormData({ ...formData, semesterName: e.target.value })}
+                  className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 transition-colors focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                  placeholder="Masalan: 1-semestr (ixtiyoriy)"
                 />
               </div>
 
@@ -262,4 +280,3 @@ const GroupsModern = () => {
 };
 
 export default GroupsModern;
-

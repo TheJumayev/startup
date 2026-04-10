@@ -28,21 +28,40 @@ const Navbar = (props) => {
 
   const getAdmin = async () => {
     try {
+      const token = localStorage.getItem("token") || localStorage.getItem("access_token");
+      if (!token) {
+        localStorage.clear();
+        navigate("/admin/login");
+        return;
+      }
+
       const response = await ApiCall("/api/v1/auth/decode", "GET", null);
+
+      if (!response || response.error) {
+        localStorage.clear();
+        navigate("/admin/login");
+        return;
+      }
+
       const data = response.data;
+
+      if (!data || data.status >= 400) {
+        localStorage.clear();
+        navigate("/admin/login");
+        return;
+      }
+
       setAdmin(data);
 
-      if (response.data.status === 500) {
-        navigate("/admin/login");
-      }
-      // 🔹 faqat login sahifasida bo‘lmaganida redirect qilamiz
-      if (!data || data.roles?.[0]?.name !== "ROLE_ADMIN") {
+      // 🔹 faqat login sahifasida bo'lmaganida redirect qilamiz
+      if (data.roles?.[0]?.name !== "ROLE_ADMIN") {
+        localStorage.clear();
         navigate("/admin/login");
       }
     } catch (error) {
-      navigate("/admin/login");
-
       console.error("Error fetching account data:", error);
+      localStorage.clear();
+      navigate("/admin/login");
     }
   };
 

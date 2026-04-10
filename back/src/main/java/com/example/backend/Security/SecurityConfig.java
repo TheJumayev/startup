@@ -16,6 +16,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -28,33 +34,59 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .cors()
-                .and()
-                .csrf().disable()
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(
                         auth -> auth
-                                .requestMatchers("/").permitAll()
+                                // Auth endpointlar
                                 .requestMatchers("/api/v1/auth/login").permitAll()
                                 .requestMatchers("/api/v1/auth/refresh").permitAll()
-                                .requestMatchers("/api/v1/student").permitAll()
-                                .requestMatchers("/api/v1/superadmin/category").permitAll()
-                                .requestMatchers("/api/v1/superadmin/subcategory/").permitAll()
-                                .requestMatchers("/api/v1/superadmin/subcategory/**").permitAll()
-                                .requestMatchers("/api/v1/superadmin/subcategory/category/**").permitAll()
+                                // Student login/register
+                                .requestMatchers("/api/v1/students/login").permitAll()
+                                .requestMatchers("/api/v1/students/register").permitAll()
+                                // Students CRUD
+                                .requestMatchers("/api/v1/students/**").permitAll()
+                                .requestMatchers("/api/v1/students").permitAll()
+                                // Groups
                                 .requestMatchers("/api/v1/groups/**").permitAll()
+                                .requestMatchers("/api/v1/groups").permitAll()
+                                // Subjects
+                                .requestMatchers("/api/v1/subjects/**").permitAll()
+                                .requestMatchers("/api/v1/subjects").permitAll()
+                                // Curriculum
+                                .requestMatchers("/api/v1/curriculm/**").permitAll()
+                                .requestMatchers("/api/v1/curriculm").permitAll()
+                                // Admin
+                                .requestMatchers("/api/v1/admin/**").permitAll()
+                                // Files
+                                .requestMatchers("/api/v1/file/**").permitAll()
+                                // Superadmin
                                 .requestMatchers("/api/v1/superadmin/**").permitAll()
-                                .requestMatchers("/api/v1/subject/").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/**").permitAll()
-                                .requestMatchers(HttpMethod.DELETE, "/**").permitAll()
-                                .requestMatchers(HttpMethod.PUT, "/**").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/**").permitAll()
-                                .requestMatchers("/api/v1/file/getFile/{id}").permitAll()
+                                // Static resources
+                                .requestMatchers("/", "/index.html", "/static/**", "/*.js", "/*.css", "/*.ico", "/*.json", "/*.jpg").permitAll()
+                                // OPTIONS (CORS preflight)
+                                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                                 .anyRequest().authenticated()
                 )
-                .addFilterBefore(myFilter, UsernamePasswordAuthenticationFilter.class); // Add your custom filter before the default Spring Security filter
+                .addFilterBefore(myFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOriginPatterns(List.of("*"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowCredentials(true);
+        configuration.setExposedHeaders(Arrays.asList("Authorization", "Content-Type"));
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+
     @Bean
     public UserDetailsService users() {
         return username -> {

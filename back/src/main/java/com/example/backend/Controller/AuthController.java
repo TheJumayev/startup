@@ -35,6 +35,7 @@ public class AuthController {
 
     @GetMapping("/decode")
     public HttpEntity<?> decode(@RequestHeader("Authorization") String token) {
+        System.out.println("Received token: " + token);
         return ResponseEntity.ok(service.decode(token));
     }
 

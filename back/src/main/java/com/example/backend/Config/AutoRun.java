@@ -24,11 +24,7 @@ public class AutoRun implements CommandLineRunner {
             saveRoles();
         }
         List<Role> all = roleRepo.findAll();
-        if(all.size() ==9){
-            UserRoles roleBugalter = UserRoles.ROLE_BUGALTER;
-            Role role = new Role(10, roleBugalter);
-            roleRepo.saveAll(List.of(role));
-        }
+
 
        if(all.size() ==10){
            UserRoles roleBugalter = UserRoles.ROLE_OFFICE;
@@ -39,9 +35,9 @@ public class AutoRun implements CommandLineRunner {
         checkAndCreateUser("admin", "00000000", "Default Admin", UserRoles.ROLE_ADMIN);
         checkAndCreateUser("user", "00000000", "USER DEF", UserRoles.ROLE_USER);
         checkAndCreateUser("superadmin", "00000000", "SUPER ADMIN", UserRoles.ROLE_SUPERADMIN);
+        checkAndCreateUser("teacher", "00000000", "Teacher", UserRoles.ROLE_TEACHER);
         checkAndCreateUser("Akobir", "Akobir", "SUPER ADMIN", UserRoles.ROLE_SUPERADMIN);
         checkAndCreateUser("rektor", "00000000", "REKTOR", UserRoles.ROLE_REKTOR);
-        checkAndCreateUser("bugalter", "00000000", "Uchqun Jo'rayev", UserRoles.ROLE_BUGALTER);
 
     }
 
@@ -72,7 +68,8 @@ public class AutoRun implements CommandLineRunner {
                 new Role(2, UserRoles.ROLE_STUDENT),
                 new Role(3, UserRoles.ROLE_REKTOR),
                 new Role(5, UserRoles.ROLE_SUPERADMIN),
-                new Role(6, UserRoles.ROLE_USER)
+                new Role(6, UserRoles.ROLE_USER),
+                new Role(7, UserRoles.ROLE_TEACHER)
         ));
     }
 

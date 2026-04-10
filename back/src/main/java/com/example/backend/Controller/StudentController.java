@@ -101,11 +101,31 @@ public class StudentController {
     }
 
     @PostMapping
-    public ResponseEntity<StudentDTO> create(@RequestBody StudentDTO dto) {
+    public ResponseEntity<?> create(@RequestBody StudentDTO dto) {
+        // Validatsiya: login majburiy
+        if (dto.getLogin() == null || dto.getLogin().trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("Login bo'sh bo'lishi mumkin emas");
+        }
+
+        // Validatsiya: fullName majburiy
+        if (dto.getFullName() == null || dto.getFullName().trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("To'liq ism bo'sh bo'lishi mumkin emas");
+        }
+
+        // Login unikal ekanligini tekshirish
+        if (studentRepo.findByLogin(dto.getLogin()).isPresent()) {
+            return ResponseEntity.badRequest().body("Bu login allaqachon mavjud");
+        }
+
+        // Password: agar frontdan kelsa shu, kelmasa random
+        String rawPassword = (dto.getPassword() != null && !dto.getPassword().trim().isEmpty())
+                ? dto.getPassword()
+                : UUID.randomUUID().toString();
+
         Student student = Student.builder()
                 .fullName(dto.getFullName())
                 .login(dto.getLogin())
-                .password(passwordEncoder.encode(UUID.randomUUID().toString()))
+                .password(passwordEncoder.encode(rawPassword))
                 .groups(dto.getGroupsId() != null ? groupsRepo.findById(dto.getGroupsId())
                         .orElseThrow(() -> new RuntimeException("Group not found")) : null)
                 .createAt(dto.getCreateAt() != null ? dto.getCreateAt() : LocalDate.now())

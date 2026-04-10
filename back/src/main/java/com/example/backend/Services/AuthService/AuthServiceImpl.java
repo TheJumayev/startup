@@ -62,6 +62,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public User decode(String token) {
+        System.out.println(token);
         if (!jwtService.validateToken(token)) {
             throw new RuntimeException("Token is expired or invalid");
         }

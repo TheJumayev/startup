@@ -1,10 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ApiCall from "../../../config";
-import Card from "../../../components/card";
-import { MdPerson, MdLock, MdVisibility, MdVisibilityOff } from "react-icons/md";
-import banner from "../../../assets/img/profile/banner.png";
-import Breadcrumbs from "views/BackLink/BackButton";
+import {
+  MdPerson,
+  MdLock,
+  MdVisibility,
+  MdVisibilityOff,
+  MdEmail,
+  MdBadge,
+  MdCheckCircle,
+} from "react-icons/md";
+import Card from "components/card";
 
 const ProfileOverview = () => {
   const navigate = useNavigate();
@@ -16,6 +22,7 @@ const ProfileOverview = () => {
   const [changePassword, setChangePassword] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
 
   useEffect(() => {
     getAdmin();
@@ -31,194 +38,258 @@ const ProfileOverview = () => {
     }
   };
 
+  const validatePassword = (pass) => {
+    if (pass.length < 8) {
+      return "Parol kamida 8 ta belgidan iborat bo'lishi kerak";
+    }
+    if (!/[A-Z]/.test(pass)) {
+      return "Parol kamida 1 ta katta harfdan iborat bo'lishi kerak";
+    }
+    if (!/[0-9]/.test(pass)) {
+      return "Parol kamida 1 ta raqamdan iborat bo'lishi kerak";
+    }
+    return "";
+  };
+
   const setPasswordHandler = async () => {
-    if (password !== confirmPassword) {
-      setPasswordError("Parollar mos kelmadi.");
+    const validationError = validatePassword(password);
+    if (validationError) {
+      setPasswordError(validationError);
       return;
     }
 
-    if (password.length < 8) {
-      setPasswordError("Parol kamida 8 ta belgidan iborat bo'lishi kerak.");
+    if (password !== confirmPassword) {
+      setPasswordError("Parollar mos kelmadi");
       return;
     }
 
     setChangePassword(true);
+    setPasswordError("");
+    setSuccessMessage("");
 
     try {
       const response = await ApiCall(
-          `/api/v1/auth/password/${admin.id}`,
-          "PUT",
-          { password }
+        `/api/v1/auth/password/${admin.id}`,
+        "PUT",
+        { password }
       );
-      console.log(response.data);
+
       setPassword("");
       setConfirmPassword("");
-      setPasswordError("");
-      alert("Parol muvaffaqiyatli yangilandi!");
+      setSuccessMessage("Parol muvaffaqiyatli yangilandi!");
+
+      setTimeout(() => {
+        setSuccessMessage("");
+      }, 3000);
     } catch (error) {
       console.error("Error updating password:", error);
-      setPasswordError("Parolni yangilashda xatolik. Iltimos, qayta urinib ko'ring.");
+      setPasswordError("Parolni yangilashda xatolik yuz berdi");
     } finally {
       setChangePassword(false);
     }
   };
 
   return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4 md:p-6">
-        <div className="mb-6">
-          <Breadcrumbs />
-        </div>
-
-        <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            {/* Profile Card */}
-            <div className="lg:col-span-8">
-              <Card extra="w-full h-full overflow-hidden border-0 shadow-xl">
-                <div
-                    className="relative h-48 w-full bg-cover bg-center"
-                    style={{ backgroundImage: `url(${banner})` }}
-                >
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+    <div className="max-w-8xl mx-auto px-4 py-8">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        {/* Profile Card */}
+        <div className="lg:col-span-1">
+          <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white">
+            {/* Profile Header */}
+            <div className="border-b border-gray-50 px-6 pt-8 pb-6">
+              <div className="flex flex-col items-center">
+                <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full border border-gray-200 bg-gradient-to-br from-gray-50 to-gray-100">
+                  <MdPerson className="h-10 w-10 text-gray-400" />
                 </div>
-
-                <div className="relative px-6 pb-6">
-                  <div className="absolute -top-16 left-6 flex h-32 w-32 items-center justify-center rounded-full border-8 border-white bg-gradient-to-r from-purple-500 to-indigo-600 shadow-lg">
-                    <MdPerson className="h-16 w-16 text-white" />
-                  </div>
-
-                  <div className="pt-20">
-                    <h1 className="text-3xl font-bold text-gray-900">
-                      {admin?.name || "Ma'sul Hodim"}
-                    </h1>
-                    <p className="text-lg text-gray-600 mt-2">
-                      Ma'sul hodim
-                    </p>
-
-                    <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="bg-blue-50 rounded-xl p-4 border border-blue-100">
-                        <p className="text-sm text-blue-600 font-medium">ID Raqam</p>
-                        <p className="text-lg font-semibold text-gray-900 mt-1">
-                          {admin?.id || "Noma'lum"}
-                        </p>
-                      </div>
-
-                      <div className="bg-green-50 rounded-xl p-4 border border-green-100">
-                        <p className="text-sm text-green-600 font-medium">Holati</p>
-                        <p className="text-lg font-semibold text-gray-900 mt-1">
-                          Faol
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </Card>
+                <h2 className="text-lg font-medium text-gray-900">
+                  {admin?.name || "Foydalanuvchi"}
+                </h2>
+                <p className="mt-0.5 text-sm text-gray-500">Administrator</p>
+              </div>
             </div>
 
-            {/* Password Change Card */}
-            <div className="lg:col-span-4">
-              <Card extra="w-full h-full border-0 shadow-xl bg-gradient-to-br from-white to-blue-50">
-                <div className="p-6">
-                  <div className="flex items-center mb-6">
-                    <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-blue-100 text-blue-600 mr-3">
-                      <MdLock className="h-6 w-6" />
-                    </div>
-                    <h2 className="text-2xl font-bold text-gray-900">
-                      Parol o'zgartirish
-                    </h2>
-                  </div>
+            {/* Profile Info */}
+            <div className="space-y-4 p-6">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-gray-500">ID</span>
+                <span className="rounded-md bg-gray-50 px-2 py-1 font-mono text-xs text-gray-900">
+                  {admin?.id || "—"}
+                </span>
+              </div>
 
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Yangi parol
-                      </label>
-                      <div className="relative">
-                        <input
-                            className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 pr-12"
-                            disabled={changePassword}
-                            type={showPassword ? "text" : "password"}
-                            placeholder="Yangi parol kiriting"
-                            value={password}
-                            onChange={(e) => {
-                              setPassword(e.target.value);
-                              if (e.target.value.length < 8) {
-                                setPasswordError(
-                                    "Parol uzunligi kamida 8 ta belgidan iborat bo'lishi kerak."
-                                );
-                              } else {
-                                setPasswordError("");
-                              }
-                            }}
-                        />
-                        <button
-                            type="button"
-                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                            onClick={() => setShowPassword(!showPassword)}
-                        >
-                          {showPassword ? <MdVisibilityOff className="h-5 w-5" /> : <MdVisibility className="h-5 w-5" />}
-                        </button>
-                      </div>
-                    </div>
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-gray-500">Holat</span>
+                <span className="text-emerald-600 bg-emerald-50 flex items-center gap-1 rounded-md px-2 py-1 text-xs">
+                  <MdCheckCircle className="h-3 w-3" />
+                  Faol
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Parolni tasdiqlash
-                      </label>
-                      <div className="relative">
-                        <input
-                            className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 pr-12"
-                            disabled={changePassword}
-                            type={showConfirmPassword ? "text" : "password"}
-                            placeholder="Parolni qayta kiriting"
-                            value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
-                        />
-                        <button
-                            type="button"
-                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        >
-                          {showConfirmPassword ? <MdVisibilityOff className="h-5 w-5" /> : <MdVisibility className="h-5 w-5" />}
-                        </button>
-                      </div>
-                    </div>
+        {/* Password Change Card */}
+        <div className="lg:col-span-2">
+          <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white">
+            {/* Card Header */}
+            <div className="border-b border-gray-50 px-6 py-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gray-50">
+                  <MdLock className="h-4 w-4 text-gray-500" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium text-gray-900">
+                    Xavfsizlik
+                  </h3>
+                  <p className="mt-0.5 text-xs text-gray-500">
+                    Parolni yangilash
+                  </p>
+                </div>
+              </div>
+            </div>
 
-                    {passwordError && (
-                        <div className="p-3 rounded-xl bg-red-50 border border-red-200">
-                          <p className="text-sm text-red-600 flex items-center">
-                            <span className="w-2 h-2 bg-red-500 rounded-full mr-2"></span>
-                            {passwordError}
-                          </p>
-                        </div>
-                    )}
-
+            {/* Card Body */}
+            <div className="p-6">
+              <div className="space-y-4">
+                {/* New Password */}
+                <div>
+                  <label className="mb-2 block text-xs font-medium uppercase tracking-wider text-gray-500">
+                    Yangi parol
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      value={password}
+                      onChange={(e) => {
+                        setPassword(e.target.value);
+                        setPasswordError("");
+                      }}
+                      disabled={changePassword}
+                      className="w-full rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-400 disabled:cursor-not-allowed disabled:opacity-50"
+                      placeholder="••••••••"
+                    />
                     <button
-                        className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-xl shadow-lg transition-all duration-200 transform hover:-translate-y-0.5 disabled:opacity-50 disabled:transform-none disabled:cursor-not-allowed flex items-center justify-center"
-                        onClick={setPasswordHandler}
-                        disabled={changePassword}
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                     >
-                      {changePassword ? (
-                          <>
-                            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                            Yangilanmoqda...
-                          </>
+                      {showPassword ? (
+                        <MdVisibilityOff className="h-4 w-4" />
                       ) : (
-                          "Parolni yangilash"
+                        <MdVisibility className="h-4 w-4" />
                       )}
                     </button>
-
-                    <div className="mt-4 p-3 bg-yellow-50 rounded-xl border border-yellow-200">
-                      <p className="text-xs text-yellow-700">
-                        <strong>Eslatma:</strong> Parol kamida 8 ta belgidan iborat bo'lishi va katta-kichik harflar, raqamlar va maxsus belgilardan tashkil topgan bo'lishi tavsiya etiladi.
-                      </p>
-                    </div>
                   </div>
                 </div>
-              </Card>
+
+                {/* Confirm Password */}
+                <div>
+                  <label className="mb-2 block text-xs font-medium uppercase tracking-wider text-gray-500">
+                    Parolni tasdiqlash
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showConfirmPassword ? "text" : "password"}
+                      value={confirmPassword}
+                      onChange={(e) => {
+                        setConfirmPassword(e.target.value);
+                        setPasswordError("");
+                      }}
+                      disabled={changePassword}
+                      className="w-full rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-400 disabled:cursor-not-allowed disabled:opacity-50"
+                      placeholder="••••••••"
+                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setShowConfirmPassword(!showConfirmPassword)
+                      }
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                      {showConfirmPassword ? (
+                        <MdVisibilityOff className="h-4 w-4" />
+                      ) : (
+                        <MdVisibility className="h-4 w-4" />
+                      )}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Password Requirements */}
+                <div className="rounded-lg bg-gray-50 p-3">
+                  <p className="mb-2 text-xs text-gray-600">Parol talablari:</p>
+                  <ul className="space-y-1">
+                    <li className="flex items-center gap-2 text-xs text-gray-500">
+                      <span
+                        className={`h-1 w-1 rounded-full ${
+                          password.length >= 8
+                            ? "bg-emerald-400"
+                            : "bg-gray-300"
+                        }`}
+                      ></span>
+                      Kamida 8 ta belgi
+                    </li>
+                    <li className="flex items-center gap-2 text-xs text-gray-500">
+                      <span
+                        className={`h-1 w-1 rounded-full ${
+                          /[A-Z]/.test(password)
+                            ? "bg-emerald-400"
+                            : "bg-gray-300"
+                        }`}
+                      ></span>
+                      Kamida 1 ta katta harf
+                    </li>
+                    <li className="flex items-center gap-2 text-xs text-gray-500">
+                      <span
+                        className={`h-1 w-1 rounded-full ${
+                          /[0-9]/.test(password)
+                            ? "bg-emerald-400"
+                            : "bg-gray-300"
+                        }`}
+                      ></span>
+                      Kamida 1 ta raqam
+                    </li>
+                  </ul>
+                </div>
+
+                {/* Error Message */}
+                {passwordError && (
+                  <div className="rounded-lg border border-red-100 bg-red-50 p-3">
+                    <p className="text-xs text-red-600">{passwordError}</p>
+                  </div>
+                )}
+
+                {/* Success Message */}
+                {successMessage && (
+                  <div className="bg-emerald-50 border-emerald-100 rounded-lg border p-3">
+                    <p className="text-emerald-600 flex items-center gap-1 text-xs">
+                      <MdCheckCircle className="h-3 w-3" />
+                      {successMessage}
+                    </p>
+                  </div>
+                )}
+
+                {/* Submit Button */}
+                <button
+                  onClick={setPasswordHandler}
+                  disabled={changePassword || !password || !confirmPassword}
+                  className="w-full rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-gray-900"
+                >
+                  {changePassword ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white"></div>
+                      Yangilanmoqda...
+                    </span>
+                  ) : (
+                    "Parolni yangilash"
+                  )}
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </div>
+    </div>
   );
 };
 

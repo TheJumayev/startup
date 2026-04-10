@@ -40,35 +40,16 @@ public class AuthController {
 
     @PutMapping("/password/{adminId}")
     public HttpEntity<?> password(@RequestBody PasswordUpdateRequest request, @PathVariable UUID adminId) {
-        System.out.printf("Password update request: %s%n", request.getPassword());
-        System.out.printf("Admin Id: %s%n", adminId);
         return ResponseEntity.ok(service.password(adminId, request.getPassword()));
-//        if (request.getPassword() == null || request.getPassword().isEmpty()) {
-//            return ResponseEntity.badRequest().body("Password cannot be empty");
-//        }
-//        Optional<User> byId = userRepo.findById(adminId);
-//        if (byId.isEmpty()) {
-//            return ResponseEntity.notFound().build();
-//        }
-//        System.out.printf("byId: %s%n", byId);
-//
-//        User user = byId.get();
-//        user.setPassword); // Ensure password is hashed before saving
-//
-//        userRepo.save(user);
-//
-//        return ResponseEntity.ok().build();
     }
 
     // Inner class for password update request
     public static class PasswordUpdateRequest {
         private String password;
-
         // Getters and setters
         public String getPassword() {
             return password;
         }
-
         public void setPassword(String password) {
             this.password = password;
         }

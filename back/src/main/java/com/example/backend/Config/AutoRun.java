@@ -3,6 +3,7 @@ package com.example.backend.Config;
 import com.example.backend.Entity.Role;
 import com.example.backend.Entity.User;
 import com.example.backend.Entity.WeekDays;
+import com.example.backend.Entity.*;
 import com.example.backend.Enums.UserRoles;
 import com.example.backend.Repository.RoleRepo;
 import com.example.backend.Repository.UserRepo;
@@ -22,36 +23,33 @@ public class AutoRun implements CommandLineRunner {
     private final RoleRepo roleRepo;
     private final UserRepo userRepo;
     private final PasswordEncoder passwordEncoder;
-    private final WeekDayRepo weekDayRepo;
 
     @Override
-    public void run(String... args) {
-
-        // ✅ 1. Создаем ВСЕ роли
-        saveRoles();
-
-        // ✅ 2. Дни недели
-        if (weekDayRepo.findAll().isEmpty()) {
-            weekDayRepo.saveAll(List.of(
-                    new WeekDays(1, "DUSHANBA"),
-                    new WeekDays(2, "SESHANBA"),
-                    new WeekDays(3, "CHORSHANBA"),
-                    new WeekDays(4, "PAYSHANBA"),
-                    new WeekDays(5, "JUMA"),
-                    new WeekDays(6, "SHANBA"),
-                    new WeekDays(7, "YAKSHANBA")
-            ));
+    public void run(String... args) throws Exception {
+        if (roleRepo.findAll().isEmpty()) {
+            saveRoles();
         }
+        List<Role> all = roleRepo.findAll();
+        if(all.size() ==9){
+            UserRoles roleBugalter = UserRoles.ROLE_BUGALTER;
+            Role role = new Role(10, roleBugalter);
+            roleRepo.saveAll(List.of(role));
+        }
+
+       if(all.size() ==10){
+           UserRoles roleBugalter = UserRoles.ROLE_OFFICE;
+           Role role = new Role(11, roleBugalter);
+           roleRepo.saveAll(List.of(role));
+       }
 
         // ✅ 3. Пользователи
         checkAndCreateUser("admin", "00000000", "Default Admin", UserRoles.ROLE_ADMIN);
-        checkAndCreateUser("user", "00000000", "User", UserRoles.ROLE_USER);
-        checkAndCreateUser("superadmin", "00000000", "Super Admin", UserRoles.ROLE_SUPERADMIN);
-        checkAndCreateUser("rektor", "00000000", "Rektor", UserRoles.ROLE_REKTOR);
-        checkAndCreateUser("bugalter", "00000000", "Bugalter", UserRoles.ROLE_BUGALTER);
-        checkAndCreateUser("sekretar", "00000000", "Sekretar", UserRoles.ROLE_SECRETARY);
-        checkAndCreateUser("test", "00000000", "Test Center", UserRoles.ROLE_TEST_CENTER);
-        checkAndCreateUser("office", "00000000", "Office", UserRoles.ROLE_OFFICE);
+        checkAndCreateUser("user", "00000000", "USER DEF", UserRoles.ROLE_USER);
+        checkAndCreateUser("superadmin", "00000000", "SUPER ADMIN", UserRoles.ROLE_SUPERADMIN);
+        checkAndCreateUser("Akobir", "Akobir", "SUPER ADMIN", UserRoles.ROLE_SUPERADMIN);
+        checkAndCreateUser("rektor", "00000000", "REKTOR", UserRoles.ROLE_REKTOR);
+        checkAndCreateUser("bugalter", "00000000", "Uchqun Jo'rayev", UserRoles.ROLE_BUGALTER);
+
     }
 
     // ✅ создание ролей безопасно
@@ -65,8 +63,13 @@ public class AutoRun implements CommandLineRunner {
         }
     }
 
-    // ✅ создание пользователя безопасно
-    private void checkAndCreateUser(String phone, String password, String name, UserRoles roleEnum) {
+    private void checkAndCreateUser(String phone, String password, String name, UserRoles role) {
+        Optional<Role> byName = roleRepo.findByName(role);
+        if (byName.isEmpty()) {
+            return;
+        }
+        List<Role> all = List.of(byName.get());
+
 
         Optional<User> userByPhone = userRepo.findByPhone(phone);
 
@@ -82,10 +85,22 @@ public class AutoRun implements CommandLineRunner {
                     .phone(phone)
                     .name(name)
                     .password(passwordEncoder.encode(password))
-                    .roles(List.of(role))
+                    .roles(all)
                     .build();
 
             userRepo.save(user);
         }
     }
+
+    private List<Role> saveRoles() {
+        return roleRepo.saveAll(List.of(
+                new Role(1, UserRoles.ROLE_ADMIN),
+                new Role(2, UserRoles.ROLE_STUDENT),
+                new Role(3, UserRoles.ROLE_REKTOR),
+                new Role(5, UserRoles.ROLE_SUPERADMIN),
+                new Role(6, UserRoles.ROLE_USER)
+        ));
+    }
+
+
 }

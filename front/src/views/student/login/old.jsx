@@ -1,13 +1,9 @@
-import Footer from "components/footer/FooterAuthDefault";
 import { useNavigate } from "react-router-dom";
 import React, { useState } from "react";
-import bmti from "./images/2.jpg";
-import logo from "./images/loginpage.png";
-import axios from "axios";
 import ApiCall from "../../../config/index";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Logo from "../../../assets/img/ebxu_images/logo.jpg";
+import Logo from "../../../assets/img/logo.jpg";
 
 export default function Auth() {
   const navigate = useNavigate();

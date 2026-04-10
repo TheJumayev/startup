@@ -1,327 +1,288 @@
 import React, { useEffect, useState } from "react";
-import Card from "../../../components/card";
 import ApiCall from "../../../config";
-import Rodal from "rodal";
-import "rodal/lib/rodal.css";
-import { useNavigate } from "react-router-dom";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import LoadingOverlay from "components/loading/LoadingOverlay";
-import Breadcrumbs from "views/BackLink/BackButton";
+import { MdAdd, MdEdit, MdDelete, MdSearch, MdClose } from "react-icons/md";
+import Card from "components/card";
+import Select from "react-select";
 
-function Curriculum() {
-  const navigate = useNavigate();
-  const [curriculum, setCurriculum] = useState([]);
+const Curriculum = () => {
+  const [curriculums, setCurriculums] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [departments, setDepartments] = useState([]);
-  const [selectedDepartment, setSelectedDepartment] = useState("Sirtqi bo'lim");
-  const [isUpdating, setIsUpdating] = useState(false);
-
-  // Обновить группы с сервера
-  const handleUpdateCurriculum = async () => {
-    try {
-      setIsUpdating(true);
-      await getCurriculumFromHemis(); // просто инициирует обновление
-      await getCurriculum(); // получает свежие группы
-      // const newResponse = await ApiCall(`/api/v1/Curriculum/1`, "GET");
-      // console.log(newResponse.data);
-    } catch (error) {
-      console.error("Xatolik (yangilash):", error);
-      alert("O'quv reja yangilanmadi. Iltimos, qayta urinib ko'ring.");
-    } finally {
-      setIsUpdating(false);
-    }
-  };
-
-  // Получить список групп
-  const getCurriculum = async () => {
-    try {
-      const response = await ApiCall(`/api/v1/curriculum`, "GET");
-      console.log(response.data);
-      const raw = response.data;
-      const allCurriculum = Array.isArray(raw)
-        ? raw
-        : Array.isArray(raw?.data)
-          ? raw.data
-          : [];
-
-      setCurriculum(allCurriculum);
-
-      const uniqueDepartments = [
-        ...new Set(allCurriculum.map((group) => group.educationYearName)),
-      ];
-      setDepartments(uniqueDepartments);
-
-      const storedDepartment = localStorage.getItem("selectedDepartment");
-      if (storedDepartment && uniqueDepartments.includes(storedDepartment)) {
-        setSelectedDepartment(storedDepartment);
-      } else {
-        setSelectedDepartment(uniqueDepartments[0]);
-      }
-    } catch (error) {
-      console.error("Xatolik (O'quv reja):", error);
-    }
-  };
-
-  // Отправить запрос на обновление (не возвращает группы)
-  const getCurriculumFromHemis = async () => {
-    try {
-      const response = await ApiCall(`/api/v1/curriculum/update`, "GET");
-      console.log("update", response);
-      if (response?.error) {
-        toast.error("Avtorizatsiya xatosi: Token topilmadi yoki noto'g'ri.");
-        console.log(response.data);
-      } else {
-        toast.success("Muvaffaqiyatli yangilandi");
-      }
-    } catch (error) {
-      console.error("Xatolik (yangilash):", error);
-    }
-  };
+  const [formData, setFormData] = useState({
+    name: "",
+    code: "",
+    description: "",
+    duration: "",
+  });
 
   useEffect(() => {
-    getCurriculum();
+    fetchCurriculums();
   }, []);
 
-  // Фильтрация по названию группы
-  // Фильтрация по названию группы и выбранному отделу
-  const filteredCurriculum = Array.isArray(curriculum)
-    ? curriculum
-      .filter(
-        (curriculum) => curriculum?.educationYearName === selectedDepartment
-      )
-      .filter((curriculum) =>
-        curriculum?.specialty?.name
-          ?.toLowerCase()
-          .includes(searchTerm.toLowerCase())
-      )
-    : [];
-
-  const handleGroupClick = (curriculumId) => {
-    navigate(`/superadmin/curriculum/${curriculumId}`);
+  const fetchCurriculums = async () => {
+    try {
+      setLoading(true);
+      const response = await ApiCall("/api/v1/curriculums", "GET", null);
+      setCurriculums(response.data || []);
+      setError("");
+    } catch (err) {
+      console.error("Error fetching curriculums:", err);
+      setError("O'quv dasturlarni yuklashda xatolik");
+    } finally {
+      setLoading(false);
+    }
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      setLoading(true);
+      if (editingId) {
+        await ApiCall(`/api/v1/curriculums/${editingId}`, "PUT", formData);
+      } else {
+        await ApiCall("/api/v1/curriculums", "POST", formData);
+      }
+      setFormData({ name: "", code: "", description: "", duration: "" });
+      setEditingId(null);
+      setShowForm(false);
+      fetchCurriculums();
+    } catch (err) {
+      console.error("Error saving curriculum:", err);
+      setError("O'quv dasturini saqlashda xatolik");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleEdit = (curriculum) => {
+    setFormData({
+      name: curriculum.name,
+      code: curriculum.code,
+      description: curriculum.description,
+      duration: curriculum.duration,
+    });
+    setEditingId(curriculum.id);
+    setShowForm(true);
+  };
+
+  const handleDelete = async (id) => {
+    if (window.confirm("O'quv dasturini o'chirishni tasdiqlaysizmi?")) {
+      try {
+        setLoading(true);
+        await ApiCall(`/api/v1/curriculums/${id}`, "DELETE", null);
+        fetchCurriculums();
+      } catch (err) {
+        console.error("Error deleting curriculum:", err);
+        setError("O'quv dasturini o'chirishda xatolik");
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  const filteredCurriculums = curriculums.filter((curriculum) =>
+    (curriculum.name?.toLowerCase() || "").includes(searchTerm.toLowerCase())
+  );
+
   return (
-    <div className="min-h-screen p-4">
-      <ToastContainer />
-      <Breadcrumbs />
-      <div className="mx-auto max-w-7xl">
-        <h1 className="text-center text-4xl font-bold text-blue-700">
-          O'quv reja ro'yxati
-        </h1>
-
-        {/* Stats Section */}
-        <div className="p-2">
-          <div className="flex flex-col items-center justify-center gap-6 md:flex-row">
-            <div className="flex items-center gap-2 rounded-lg px-6 py-3">
-              <span className="font-medium text-gray-700">Jami bo'limlar:</span>
-              <span className="text-xl font-semibold text-blue-600">
-                {departments.length} ta
-              </span>
-            </div>
-            <div className="flex items-center gap-2 rounded-lg px-6 py-3">
-              <span className="font-medium text-gray-700">
-                Jami o'quv reja:
-              </span>
-              <span className="text-xl font-semibold text-blue-600">
-                {curriculum.length} ta
-              </span>
-            </div>
+    <div className="mx-auto max-w-7xl px-4 py-8">
+      <Card extra="p-6 mb-6">
+        <div className="mb-4 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+          <div className="flex items-center gap-2">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+              📖 O'quv dasturlari
+            </h2>
           </div>
+          <button
+            onClick={() => {
+              setFormData({ name: "", code: "", description: "", duration: "" });
+              setEditingId(null);
+              setShowForm(!showForm);
+            }}
+            className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+          >
+            <MdAdd className="h-5 w-5" />
+            Yangi dastur
+          </button>
         </div>
-        <hr />
-        {/* Department Filters */}
-        <div className="p-4">
-          <h2 className="mb-4 text-center text-lg font-semibold text-gray-700">
-            O'quv yillar bo'yicha filtrlash
-          </h2>
-          <div className="flex flex-wrap items-center justify-center gap-3">
-            {departments.map((dept, index) => (
+
+        {error && (
+          <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-red-600">
+            {error}
+          </div>
+        )}
+
+        {/* Modal */}
+        {showForm && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+            <div className="relative w-full max-w-md rounded-lg bg-white p-6 shadow-xl dark:bg-gray-800 max-h-[90vh] overflow-y-auto">
               <button
-                key={index}
-                className={`rounded-lg px-6 py-2 transition-all duration-200 hover:shadow-md ${selectedDepartment === dept
-                    ? "bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-md"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                  }`}
-                onClick={() => {
-                  setSelectedDepartment(dept);
-                  localStorage.setItem("selectedDepartment", dept);
-                }}
+                onClick={() => setShowForm(false)}
+                className="absolute right-4 top-4 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
               >
-                {dept}
+                <MdClose className="h-6 w-6" />
               </button>
-            ))}
-          </div>
-        </div>
 
-        {/* Actions Section */}
-        <div className="py-4">
-          <div className="flex flex-col items-center justify-between gap-6 md:flex-row">
-            {/* Search Input */}
-            <div className="relative w-full md:w-1/3">
-              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                <svg
-                  className="h-5 w-5 text-gray-400"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                    clipRule="evenodd"
+              <h2 className="mb-4 text-xl font-bold text-gray-900 dark:text-white">
+                {editingId ? "O'quv dasturini tahrirlash" : "Yangi o'quv dasturi yaratish"}
+              </h2>
+
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Dastur nomi
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    required
+                    className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                    placeholder="Dastur nomi kiriting"
                   />
-                </svg>
-              </div>
-              <input
-                type="text"
-                placeholder="Guruh qidiruvi..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="block w-full rounded-lg border border-gray-300 bg-gray-50 py-3 pl-10 pr-12 transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
-              />
-              {searchTerm && (
-                <button
-                  onClick={() => setSearchTerm("")}
-                  className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 transition-colors hover:text-gray-600"
-                >
-                  <svg
-                    className="h-5 w-5"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
+                </div>
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Kod
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.code}
+                    onChange={(e) => setFormData({ ...formData, code: e.target.value })}
+                    className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                    placeholder="Dastur kodi kiriting"
+                  />
+                </div>
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Muddati (oylar)
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.duration}
+                    onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
+                    className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                    placeholder="Muddati oylar bilan kiriting"
+                  />
+                </div>
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Tavsif
+                  </label>
+                  <textarea
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                    placeholder="Tavsif kiriting"
+                    rows="3"
+                  />
+                </div>
+                <div className="flex gap-2 pt-4">
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="flex-1 rounded-lg bg-green-600 px-4 py-2 text-white hover:bg-green-700 disabled:opacity-50"
                   >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </button>
-              )}
+                    {loading ? "Saqlanmoqda..." : "Saqlash"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowForm(false)}
+                    className="flex-1 rounded-lg bg-gray-400 px-4 py-2 text-white hover:bg-gray-500"
+                  >
+                    Bekor qilish
+                  </button>
+                </div>
+              </form>
             </div>
-            {/* Update Button */}
-            <button
-              onClick={handleUpdateCurriculum}
-              disabled={isUpdating}
-              className={`flex items-center gap-2 rounded-lg px-6 py-3 font-medium text-white transition-all ${isUpdating
-                  ? "bg-gray-400"
-                  : "bg-gradient-to-r from-green-500 to-green-600 shadow-md hover:from-green-600 hover:to-green-700 hover:shadow-lg"
-                }`}
-            >
-              {isUpdating ? (
-                <>
-                  <svg
-                    className="h-5 w-5 animate-spin text-white"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    ></circle>
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    ></path>
-                  </svg>
-                  Yangilanmoqda...
-                </>
-              ) : (
-                <>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  O'quv rejani yangilash
-                </>
-              )}
-            </button>
+          </div>
+        )}
+
+        <div className="mb-4">
+          <div className="relative">
+            <MdSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              placeholder="O'quv dasturlarini qidirish..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full rounded-lg border border-gray-300 bg-white py-2 pl-10 pr-4 text-gray-900 focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+            />
           </div>
         </div>
+      </Card>
 
-        {/* Curriculum Cards */}
-        <div className="mb-8">
-          {isUpdating ? (
-            <LoadingOverlay text="Yangilanmoqda..." />
-          ) : filteredCurriculum.length > 0 ? (
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {filteredCurriculum.map((curriculum) => (
-                <div
-                  key={curriculum.id}
-                  className="group relative transform cursor-pointer overflow-hidden rounded-xl bg-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
-                  onClick={() => handleGroupClick(curriculum.id)}
-                >
-                  <div className="p-6">
-                    <h2 className="mb-2 text-xl font-bold text-gray-800 transition-colors group-hover:text-white">
-                      {curriculum?.specialty.name}
-                    </h2>
-                    <p className="text-gray-600 transition-colors group-hover:text-blue-100">
-                      <b>O'quv reja kodi: </b>
-                      {curriculum?.specialty?.code || "Noma'lum"}
-                    </p>
-                    <p className="text-gray-600 transition-colors group-hover:text-blue-100">
-                      <b>Kafedra: </b>
-                      {curriculum?.specialty?.department?.name || "Noma'lum"}
-                    </p>
-                  </div>
-                  <div className="absolute inset-0 -z-10 bg-gradient-to-br from-blue-500 to-blue-600 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></div>
-                </div>
+      {loading && <div className="text-center">Yuklanmoqda...</div>}
+
+      {filteredCurriculums.length === 0 ? (
+        <Card extra="p-6 text-center">
+          <p className="text-gray-500">O'quv dasturlari topilmadi</p>
+        </Card>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse">
+            <thead>
+              <tr className="bg-gray-100 dark:bg-gray-800">
+                <th className="border border-gray-300 px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:border-gray-600 dark:text-white">
+                  Nomi
+                </th>
+                <th className="border border-gray-300 px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:border-gray-600 dark:text-white">
+                  Kod
+                </th>
+                <th className="border border-gray-300 px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:border-gray-600 dark:text-white">
+                  Muddati
+                </th>
+                <th className="border border-gray-300 px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:border-gray-600 dark:text-white">
+                  Tavsif
+                </th>
+                <th className="border border-gray-300 px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:border-gray-600 dark:text-white">
+                  Harakatlari
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredCurriculums.map((curriculum) => (
+                <tr key={curriculum.id} className="border border-gray-200 hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800">
+                  <td className="border border-gray-300 px-4 py-3 text-gray-900 dark:border-gray-600 dark:text-white">
+                    {curriculum.name}
+                  </td>
+                  <td className="border border-gray-300 px-4 py-3 text-gray-900 dark:border-gray-600 dark:text-white">
+                    {curriculum.code}
+                  </td>
+                  <td className="border border-gray-300 px-4 py-3 text-gray-900 dark:border-gray-600 dark:text-white">
+                    {curriculum.duration} oy
+                  </td>
+                  <td className="border border-gray-300 px-4 py-3 text-gray-600 dark:border-gray-600 dark:text-gray-400">
+                    {curriculum.description}
+                  </td>
+                  <td className="border border-gray-300 px-4 py-3">
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleEdit(curriculum)}
+                        className="rounded bg-blue-500 p-2 text-white hover:bg-blue-600"
+                      >
+                        <MdEdit className="h-4 w-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(curriculum.id)}
+                        className="rounded bg-red-500 p-2 text-white hover:bg-red-600"
+                      >
+                        <MdDelete className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
               ))}
-            </div>
-          ) : (
-            <div className="rounded-xl bg-white py-12 text-center shadow-sm">
-              <svg
-                className="mx-auto h-12 w-12 text-gray-400"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              <h3 className="mt-2 text-lg font-medium text-gray-900">
-                O'quv reja topilmadi
-              </h3>
-              <p className="mx-auto mt-1 max-w-md text-gray-500">
-                {searchTerm || selectedDepartment !== "Sirtqi bo'lim"
-                  ? "Qidiruvga mos yoki tanlangan bo'limdagi O'quv reja mavjud emas"
-                  : "O'quv reja ro'yxati hozircha bo'sh"}
-              </p>
-            </div>
-          )}
+            </tbody>
+          </table>
         </div>
-
-        {/* Results Count */}
-        <div className="p-4 text-center">
-          <p className="text-lg text-gray-700">
-            Topilgan O'quv reja:{" "}
-            <span className="text-2xl font-bold text-blue-600">
-              {filteredCurriculum.length} ta
-            </span>
-          </p>
-        </div>
-      </div>
+      )}
     </div>
   );
-}
+};
 
 export default Curriculum;
+

@@ -2,7 +2,6 @@ import React from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import Navbar from "./navbar";
 import Sidebar from "./sidebar";
-import Footer from "components/footer/Footer";
 import routes from "../../routes/superadmin";
 
 export default function Admin(props) {
@@ -85,9 +84,6 @@ export default function Admin(props) {
                   element={<Navigate to="/superadmin/default" replace />}
                 />
               </Routes>
-            </div>
-            <div className="p-3">
-              <Footer />
             </div>
           </div>
         </main>

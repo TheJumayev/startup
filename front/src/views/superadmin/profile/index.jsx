@@ -77,139 +77,227 @@ const ProfileOverview = () => {
   };
 
   return (
-    <div className="max-w-8xl mx-auto px-4 py-8">
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
-        {/* Profile Card - Minimal */}
-        <div className="lg:col-span-4">
-          <Card extra="p-6">
-            <div className="flex flex-col items-center">
-              {/* Avatar */}
-              <div className="relative mb-4">
-                <div className="flex h-24 w-24 items-center justify-center rounded-full border-2 border-white bg-gradient-to-br from-blue-50 to-indigo-50 shadow-sm dark:from-gray-700 dark:to-gray-600">
-                  <MdPerson className="h-12 w-12 text-gray-600 dark:text-gray-300" />
-                </div>
-                <div className="absolute bottom-1 right-1 h-4 w-4 rounded-full border-2 border-white bg-green-500"></div>
-              </div>
+    <div className="px-4 py-8 mx-auto max-w-8xl">
+  <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
+    
+    {/* Profile Card - 3D va animatsiyalar bilan */}
+    <div className="lg:col-span-4 animate-fade-in-left">
+      <Card extra="relative overflow-hidden bg-gradient-to-br from-white via-white to-blue-50/50 p-6 shadow-xl transition-all duration-500 hover:shadow-2xl hover:scale-[1.02] border border-blue-100">
+        {/* Decorative background */}
+        <div className="absolute w-40 h-40 rounded-full -top-20 -right-20 bg-gradient-to-br from-blue-100 to-blue-200 blur-2xl" />
+        <div className="absolute w-40 h-40 rounded-full -bottom-20 -left-20 bg-gradient-to-tr from-blue-50 to-indigo-100 blur-2xl" />
+        
+        {/* Top decorative bar */}
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600" />
 
-              {/* Info */}
-              <h2 className="mb-1 text-xl font-medium text-gray-900 dark:text-white">
-                {admin?.name || "Foydalanuvchi"}
-              </h2>
-              <p className="mb-4 text-sm text-gray-500 dark:text-gray-400">
-                Bo'lim boshlig'i
-              </p>
-
-              {/* Stats */}
-              <div className="w-full border-t border-gray-100 pt-4 dark:border-gray-700">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">ID:</span>
-                  <span className="font-mono text-gray-900 dark:text-white">
-                    {admin?.id || "—"}
-                  </span>
-                </div>
-              </div>
+        <div className="relative z-10 flex flex-col items-center">
+          {/* Avatar with 3D hover effect */}
+          <div className="relative mb-5 group">
+            <div className="absolute inset-0 transition-all duration-500 rounded-full opacity-0 bg-gradient-to-r from-blue-400 to-blue-600 blur-xl group-hover:opacity-60" />
+            <div className="relative flex items-center justify-center transition-all duration-500 rounded-full shadow-md h-28 w-28 bg-gradient-to-br from-blue-100 via-blue-200 to-blue-300 group-hover:scale-110 group-hover:shadow-xl group-hover:rotate-3">
+              <MdPerson className="text-blue-600 transition-all duration-500 h-14 w-14 group-hover:scale-110" />
             </div>
-          </Card>
+            {/* Online status */}
+            <div className="absolute bottom-2 right-2 h-4.5 w-4.5 rounded-full border-3 border-white bg-gradient-to-r from-green-400 to-emerald-500 shadow-sm animate-pulse">
+              <div className="absolute inset-0 bg-green-400 rounded-full opacity-75 animate-ping" />
+            </div>
+          </div>
+
+          {/* User Info */}
+          <h2 className="mb-1 text-2xl font-bold text-gray-800 transition-all duration-300 hover:text-blue-600">
+            {admin?.name || "Foydalanuvchi"}
+          </h2>
+          
+          <div className="flex items-center gap-2 mb-4">
+            <div className="h-1.5 w-1.5 rounded-full bg-blue-500" />
+            <p className="text-sm text-gray-500">Bo'lim boshlig'i</p>
+            <div className="h-1.5 w-1.5 rounded-full bg-blue-500" />
+          </div>
+
+          {/* Badge */}
+          <div className="mb-6">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-100 rounded-full">
+              <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse" />
+              Super Admin
+            </span>
+          </div>
+
+          {/* Stats */}
+          <div className="w-full pt-4 space-y-3 border-t border-blue-100">
+            <div className="flex items-center justify-between p-2 transition-all duration-300 rounded-lg hover:bg-blue-50">
+              <span className="text-sm text-gray-500">ID:</span>
+              <span className="font-mono text-sm font-semibold text-gray-800">
+                {admin?.id || "—"}
+              </span>
+            </div>
+            <div className="flex items-center justify-between p-2 transition-all duration-300 rounded-lg hover:bg-blue-50">
+              <span className="text-sm text-gray-500">Email:</span>
+              <span className="text-sm text-gray-700">
+                {admin?.email || "admin@edu.uz"}
+              </span>
+            </div>
+            <div className="flex items-center justify-between p-2 transition-all duration-300 rounded-lg hover:bg-blue-50">
+              <span className="text-sm text-gray-500">Ro'yxatdan:</span>
+              <span className="text-sm text-gray-700">
+                {admin?.createdAt || "2024-01-15"}
+              </span>
+            </div>
+          </div>
+        </div>
+      </Card>
+    </div>
+
+    {/* Password Change - 3D va animatsiyalar bilan */}
+    <div className="lg:col-span-8 animate-fade-in-right">
+      <Card extra="relative overflow-hidden bg-gradient-to-br from-white via-white to-blue-50/30 p-6 shadow-xl transition-all duration-500 hover:shadow-2xl border border-blue-100">
+        {/* Decorative elements */}
+        <div className="absolute top-0 right-0 w-64 h-64 rounded-full bg-gradient-to-br from-blue-100/40 to-blue-200/20 blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-48 h-48 rounded-full bg-gradient-to-tr from-blue-50/30 to-indigo-100/20 blur-2xl" />
+
+        {/* Header */}
+        <div className="relative flex items-center gap-4 mb-8">
+          <div className="relative group">
+            <div className="absolute inset-0 transition-all duration-500 opacity-0 bg-gradient-to-r from-blue-400 to-blue-600 rounded-xl blur-md group-hover:opacity-60" />
+            <div className="relative p-3 transition-all duration-300 shadow-md rounded-xl bg-gradient-to-br from-blue-100 to-blue-200 group-hover:scale-110 group-hover:rotate-6">
+              <MdLock className="w-6 h-6 text-blue-600" />
+            </div>
+          </div>
+          <div>
+            <h3 className="text-xl font-bold text-gray-800">
+              Parolni yangilash
+            </h3>
+            <p className="text-sm text-gray-500 mt-0.5">
+              Xavfsizlikni oshirish uchun muntazam yangilab turing
+            </p>
+          </div>
         </div>
 
-        {/* Password Change - Minimal */}
-        <div className="lg:col-span-8">
-          <Card extra="p-6">
-            <div className="mb-6 flex items-center gap-3">
-              <div className="rounded-lg bg-gray-50 p-2 dark:bg-gray-800">
-                <MdLock className="h-5 w-5 text-gray-600 dark:text-gray-400" />
-              </div>
-              <div>
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-                  Parolni yangilash
-                </h3>
-                <p className="text-sm text-gray-500">
-                  Xavfsizlikni oshirish uchun muntazam yangilab turing
-                </p>
-              </div>
-            </div>
-
-            <div className="max-w-md space-y-5">
-              {/* New Password */}
-              <div>
-                <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Yangi parol
-                </label>
-                <div className="relative">
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={(e) => {
-                      setPassword(e.target.value);
-                      setPasswordError("");
-                    }}
-                    disabled={changePassword}
-                    className="w-full rounded-lg border border-gray-200 bg-white px-4 py-2.5 pr-10 text-sm text-gray-900 placeholder-gray-400 transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
-                    placeholder="••••••••"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-                  >
-                    {showPassword ? "👁" : "👁‍🗨"}
-                  </button>
-                </div>
-                <p className="mt-2 text-xs text-gray-500">
-                  Kamida 8 belgi, 1 ta katta harf va 1 ta raqam
-                </p>
-              </div>
-
-              {/* Confirm Password */}
-              <div>
-                <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Parolni tasdiqlash
-                </label>
-                <div className="relative">
-                  <input
-                    type={showConfirmPassword ? "text" : "password"}
-                    value={confirmPassword}
-                    onChange={(e) => {
-                      setConfirmPassword(e.target.value);
-                      setPasswordError("");
-                    }}
-                    disabled={changePassword}
-                    className="w-full rounded-lg border border-gray-200 bg-white px-4 py-2.5 pr-10 text-sm text-gray-900 placeholder-gray-400 transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
-                    placeholder="••••••••"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-                  >
-                    {showConfirmPassword ? "👁" : "👁‍🗨"}
-                  </button>
-                </div>
-              </div>
-
-              {/* Error Message */}
-              {passwordError && (
-                <div className="rounded-lg border border-red-100 bg-red-50 p-3 dark:border-red-800 dark:bg-red-900/20">
-                  <p className="text-sm text-red-600 dark:text-red-400">
-                    {passwordError}
-                  </p>
-                </div>
-              )}
-
-              {/* Submit Button */}
+        <div className="relative max-w-md space-y-6">
+          {/* New Password */}
+          <div className="group">
+            <label className="block mb-2 text-sm font-semibold text-gray-700">
+              Yangi parol
+            </label>
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  setPasswordError("");
+                }}
+                disabled={changePassword}
+                className="w-full px-4 py-3 pr-12 text-sm text-gray-900 placeholder-gray-400 transition-all duration-300 border-2 border-gray-200 rounded-xl bg-white/50 focus:border-blue-400 focus:outline-none focus:ring-4 focus:ring-blue-400/20 disabled:cursor-not-allowed disabled:opacity-50 hover:border-blue-300 hover:shadow-md"
+                placeholder="••••••••"
+              />
               <button
-                onClick={setPasswordHandler}
-                disabled={changePassword || !password || !confirmPassword}
-                className="flex w-full items-center justify-center gap-2 rounded-lg bg-gray-900 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-gray-900 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100 dark:disabled:hover:bg-white sm:w-auto"
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute text-gray-400 transition-all duration-300 -translate-y-1/2 right-3 top-1/2 hover:text-blue-500 hover:scale-110"
               >
-                <MdSave className="h-4 w-4" />
-                {changePassword ? "Saqlanmoqda..." : "Saqlash"}
+                {showPassword ? "👁" : "👁‍🗨"}
               </button>
             </div>
-          </Card>
+            <p className="flex items-center gap-1 mt-2 text-xs text-gray-400">
+              <span className="w-1 h-1 bg-gray-400 rounded-full" />
+              Kamida 8 belgi, 1 ta katta harf va 1 ta raqam
+            </p>
+          </div>
+
+          {/* Confirm Password */}
+          <div className="group">
+            <label className="block mb-2 text-sm font-semibold text-gray-700">
+              Parolni tasdiqlash
+            </label>
+            <div className="relative">
+              <input
+                type={showConfirmPassword ? "text" : "password"}
+                value={confirmPassword}
+                onChange={(e) => {
+                  setConfirmPassword(e.target.value);
+                  setPasswordError("");
+                }}
+                disabled={changePassword}
+                className="w-full px-4 py-3 pr-12 text-sm text-gray-900 placeholder-gray-400 transition-all duration-300 border-2 border-gray-200 rounded-xl bg-white/50 focus:border-blue-400 focus:outline-none focus:ring-4 focus:ring-blue-400/20 disabled:cursor-not-allowed disabled:opacity-50 hover:border-blue-300 hover:shadow-md"
+                placeholder="••••••••"
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className="absolute text-gray-400 transition-all duration-300 -translate-y-1/2 right-3 top-1/2 hover:text-blue-500 hover:scale-110"
+              >
+                {showConfirmPassword ? "👁" : "👁‍🗨"}
+              </button>
+            </div>
+          </div>
+
+          {/* Password Strength Indicator */}
+          {password && (
+            <div className="space-y-1">
+              <div className="flex gap-1">
+                {[1, 2, 3, 4].map((level) => (
+                  <div
+                    key={level}
+                    className={`h-1 flex-1 rounded-full transition-all duration-500 ${
+                      password.length >= level * 2
+                        ? level <= 2
+                          ? "bg-gradient-to-r from-blue-400 to-blue-500"
+                          : level === 3
+                          ? "bg-gradient-to-r from-blue-500 to-indigo-500"
+                          : "bg-gradient-to-r from-indigo-500 to-purple-500"
+                        : "bg-gray-200"
+                    }`}
+                  />
+                ))}
+              </div>
+              <p className="text-xs text-gray-400">
+                Parol kuchi:{" "}
+                {password.length >= 8
+                  ? password.match(/[A-Z]/) && password.match(/[0-9]/)
+                    ? "Kuchli"
+                    : "O'rtacha"
+                  : "Kuchsiz"}
+              </p>
+            </div>
+          )}
+
+          {/* Error Message */}
+          {passwordError && (
+            <div className="rounded-xl border border-rose-200 bg-gradient-to-r from-rose-50 to-rose-100 p-3.5 animate-shake">
+              <p className="flex items-center gap-2 text-sm text-rose-600">
+                <span className="text-lg">⚠️</span>
+                {passwordError}
+              </p>
+            </div>
+          )}
+
+          {/* Submit Button - Ko'k rangda */}
+          <div className="pt-2">
+            <button
+              onClick={setPasswordHandler}
+              disabled={changePassword || !password || !confirmPassword}
+              className="relative flex items-center justify-center w-full gap-2 px-6 py-3 overflow-hidden text-sm font-semibold text-white transition-all duration-500 group rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 hover:shadow-lg hover:shadow-blue-200 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:shadow-none sm:w-auto"
+            >
+              <div className="absolute inset-0 transition-transform duration-700 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:translate-x-full" />
+              <MdSave className="w-4 h-4 transition-all duration-300 group-hover:scale-110 group-hover:rotate-12" />
+              {changePassword ? (
+                <span className="flex items-center gap-2">
+                  <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  Saqlanmoqda...
+                </span>
+              ) : (
+                "Saqlash"
+              )}
+            </button>
+          </div>
         </div>
-      </div>
+      </Card>
     </div>
+  </div>
+</div>
   );
 };
 

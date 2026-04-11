@@ -26,3 +26,185 @@ input.defaultCheckbox::before {
 input:checked.defaultCheckbox::before {
   opacity: 1;
 }
+
+
+
+/* Float animatsiyalar */
+@keyframes float-slow {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.3;
+  }
+  33% {
+    transform: translate(30px, -30px) scale(1.1);
+    opacity: 0.5;
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+    opacity: 0.4;
+  }
+}
+
+.animate-float-slow {
+  animation: float-slow 15s ease-in-out infinite;
+}
+
+.animate-float-slower {
+  animation: float-slow 25s ease-in-out infinite reverse;
+}
+
+/* Scanning chiziq */
+@keyframes scan {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.3;
+  }
+  100% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+}
+
+.animate-scan {
+  animation: scan 8s linear infinite;
+}
+
+.animate-scan-delayed {
+  animation: scan 8s linear infinite 2s;
+}
+
+/* Ping animatsiyasi */
+@keyframes ping-slow {
+  0% {
+    transform: scale(1);
+    opacity: 0.4;
+  }
+  75%, 100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+.animate-ping-slow {
+  animation: ping-slow 3s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+/* Slide down animatsiya */
+@keyframes slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-down {
+  animation: slide-down 0.5s ease-out forwards;
+}
+
+/* Fade in up */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s ease-out forwards;
+}
+
+/* Gradient animatsiyasi */
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-gradient {
+  background-size: 300% 300%;
+  animation: gradient 3s ease infinite;
+}
+
+.bg-300\% {
+  background-size: 300% 300%;
+}
+
+/* Sekin pulsatsiya */
+@keyframes pulse-slow {
+  0%, 100% {
+    opacity: 0.2;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.2);
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 4s ease-in-out infinite;
+}
+
+/* Yengil sakrash */
+@keyframes bounce-subtle {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+.animate-bounce-subtle {
+  animation: bounce-subtle 2s ease-in-out infinite;
+}
+
+/* Spin slow */
+@keyframes spin-slow {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 20s linear infinite;
+}
+
+/* Scrollbar - zamonaviy */
+main::-webkit-scrollbar {
+  width: 6px;
+}
+
+main::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 10px;
+}
+
+main::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, #3b82f6, #a855f7);
+  border-radius: 10px;
+}
+
+main::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(to bottom, #2563eb, #9333ea);
+}

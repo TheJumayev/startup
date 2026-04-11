@@ -48,27 +48,27 @@ export default function Auth() {
   };
 
   return (
-    <div className="selection:bg-primary/10 selection:text-primary min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen selection:bg-primary/10 selection:text-primary bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
       <ToastContainer />
-      <section className="flex min-h-screen items-center justify-center">
-        <div className="mx-auto flex max-w-5xl items-center justify-center px-4 sm:px-6 lg:px-8">
-          <div className="my-8 flex flex-col items-center justify-center md:my-12">
-            <div className="relative w-full max-w-md rounded-2xl border border-gray-100/70 bg-white/80 p-6 shadow-2xl shadow-blue-500/10 backdrop-blur-lg dark:border-gray-700/50 dark:bg-gray-800/80 dark:shadow-none">
+      <section className="flex items-center justify-center min-h-screen">
+        <div className="flex items-center justify-center max-w-5xl px-4 mx-auto sm:px-6 lg:px-8">
+          <div className="flex flex-col items-center justify-center my-8 md:my-12">
+            <div className="relative w-full max-w-md p-6 border shadow-2xl rounded-2xl border-gray-100/70 bg-white/80 shadow-blue-500/10 backdrop-blur-lg dark:border-gray-700/50 dark:bg-gray-800/80 dark:shadow-none">
               {/* Logo/Header section */}
-              <div className="mb-8 flex flex-col items-center text-center">
+              <div className="flex flex-col items-center mb-8 text-center">
                 {/* Logo qismi */}
-                <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full shadow-lg ring-2 ring-blue-200">
+                <div className="flex items-center justify-center w-20 h-20 mb-4 rounded-full shadow-lg ring-2 ring-blue-200">
                   <img
                     src={Logo}
                     alt="BXU Logo"
-                    className="h-20 w-20 object-contain"
+                    className="object-contain w-20 h-20"
                   />
                 </div>
                 {/* Sarlavha */}
                 <h2 className="max-w-2xl text-2xl font-extrabold leading-snug text-gray-800 dark:text-white">
-                  Buxoro Xalqaro Universiteti <br />
+                  
                   <span className="text-blue-600 dark:text-blue-400">
-                    EDU.BXU.UZ
+                   SMART EDU
                   </span>{" "}
                   elektron platformasi
                 </h2>
@@ -77,7 +77,7 @@ export default function Auth() {
               {/* Login form */}
               <form onSubmit={handleStudentSubmit} className="space-y-5">
                 <div className="mb-2 text-center">
-                  <p className="rounded-lg bg-blue-50 py-2 px-4 text-sm text-gray-600 dark:bg-blue-900/20 dark:text-gray-300">
+                  <p className="px-4 py-2 text-sm text-gray-600 rounded-lg bg-blue-50 dark:bg-blue-900/20 dark:text-gray-300">
                     Tizimga kirish uchun login va parolingizni kiriting
                   </p>
                 </div>
@@ -85,14 +85,14 @@ export default function Auth() {
                 <div>
                   <label
                     htmlFor="login"
-                    className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
+                    className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300"
                   >
                     Login <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
-                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                    <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                       <svg
-                        className="h-5 w-5 text-gray-400"
+                        className="w-5 h-5 text-gray-400"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -112,7 +112,7 @@ export default function Auth() {
                       autoComplete="username"
                       value={studentData.login}
                       onChange={handleStudentChange}
-                      className="block w-full rounded-xl border border-gray-200 bg-white/50 py-3 pl-10 pr-4 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-gray-600 dark:bg-gray-700/50 dark:text-white dark:focus:ring-blue-500/20"
+                      className="block w-full py-3 pl-10 pr-4 transition-all duration-200 border border-gray-200 rounded-xl bg-white/50 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-gray-600 dark:bg-gray-700/50 dark:text-white dark:focus:ring-blue-500/20"
                       placeholder="Loginingizni kiriting"
                     />
                   </div>
@@ -121,14 +121,14 @@ export default function Auth() {
                 <div>
                   <label
                     htmlFor="password"
-                    className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
+                    className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300"
                   >
                     Parol <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
-                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                    <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                       <svg
-                        className="h-5 w-5 text-gray-400"
+                        className="w-5 h-5 text-gray-400"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -148,7 +148,7 @@ export default function Auth() {
                       autoComplete="current-password"
                       value={studentData.password}
                       onChange={handleStudentChange}
-                      className="block w-full rounded-xl border border-gray-200 bg-white/50 py-3 pl-10 pr-4 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-gray-600 dark:bg-gray-700/50 dark:text-white dark:focus:ring-blue-500/20"
+                      className="block w-full py-3 pl-10 pr-4 transition-all duration-200 border border-gray-200 rounded-xl bg-white/50 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-gray-600 dark:bg-gray-700/50 dark:text-white dark:focus:ring-blue-500/20"
                       placeholder="Maxfiy parol"
                     />
                   </div>
@@ -166,7 +166,7 @@ export default function Auth() {
                   {loading ? (
                     <>
                       <svg
-                        className="-ml-1 mr-3 h-5 w-5 animate-spin text-white"
+                        className="w-5 h-5 mr-3 -ml-1 text-white animate-spin"
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
                         viewBox="0 0 24 24"
@@ -191,7 +191,7 @@ export default function Auth() {
                     <>
                       <span>Tizimga kirish</span>
                       <svg
-                        className="ml-2 h-5 w-5"
+                        className="w-5 h-5 ml-2"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -209,12 +209,12 @@ export default function Auth() {
               </form>
 
               {/* Additional info */}
-              <div className="mt-6 text-center">
+              {/* <div className="mt-6 text-center">
                 <p className="text-xs text-gray-500 dark:text-gray-400">
                   Agar login yoki parolni unutgan bo'lsangiz, registrator
                   ofisiga murojaat qiling
                 </p>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>

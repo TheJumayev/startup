@@ -74,14 +74,14 @@ export default function Auth() {
   };
 
   return (
-    <div className="selection:bg-primary/10 selection:text-primary min-h-screen bg-gradient-to-br from-blue-50 to-gray-100 dark:from-gray-900 dark:to-blue-900/20">
+    <div className="min-h-screen selection:bg-primary/10 selection:text-primary bg-gradient-to-br from-blue-50 to-gray-100 dark:from-gray-900 dark:to-blue-900/20">
       <section className="pt-10 lg:pt-20">
-        <div className="mx-auto px-4 sm:px-6 lg:px-8 xl:max-w-6xl">
+        <div className="px-4 mx-auto sm:px-6 lg:px-8 xl:max-w-6xl">
           <div className="relative">
             {/* Background effects */}
             <div
               aria-hidden="true"
-              className="absolute inset-0 -top-20 grid grid-cols-2 -space-x-52 opacity-40 dark:opacity-20"
+              className="absolute inset-0 grid grid-cols-2 -top-20 -space-x-52 opacity-40 dark:opacity-20"
             >
               <div className="from-primary h-60 bg-gradient-to-br to-purple-400 blur-[106px] dark:from-blue-700"></div>
               <div className="to-sky-500 h-40 bg-gradient-to-r from-cyan-600 blur-[106px] dark:to-indigo-600"></div>
@@ -89,12 +89,12 @@ export default function Auth() {
 
             {/* Login card */}
             <div className="flex items-center justify-center">
-              <div className="relative w-full max-w-md rounded-2xl border border-gray-200/80 bg-white/80 p-6 shadow-xl shadow-gray-400/10 backdrop-blur-sm dark:border-gray-600/50 dark:bg-gray-800/80 dark:shadow-none sm:p-8">
+              <div className="relative w-full max-w-md p-6 border shadow-xl rounded-2xl border-gray-200/80 bg-white/80 shadow-gray-400/10 backdrop-blur-sm dark:border-gray-600/50 dark:bg-gray-800/80 dark:shadow-none sm:p-8">
                 {/* Header */}
                 <div className="mb-8 text-center">
-                  <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30">
+                  <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 bg-blue-100 rounded-full dark:bg-blue-900/30">
                     <svg
-                      className="h-8 w-8 text-blue-600 dark:text-blue-400"
+                      className="w-8 h-8 text-blue-600 dark:text-blue-400"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -108,7 +108,7 @@ export default function Auth() {
                     </svg>
                   </div>
                   <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
-                    EDU.BXU.UZ
+                    SMART EDU
                   </h2>
                   <p className="mt-2 text-lg font-semibold text-blue-600 dark:text-blue-400">
                     Adminlar bo'limi
@@ -123,7 +123,7 @@ export default function Auth() {
                   <div>
                     <label
                       htmlFor="phone"
-                      className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
+                      className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300"
                     >
                       Login <span className="text-red-500">*</span>
                     </label>
@@ -134,14 +134,14 @@ export default function Auth() {
                       value={studentData.phone}
                       onChange={handleStudentChange}
                       placeholder="Loginingizni kiriting"
-                      className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-700 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-blue-400 dark:focus:ring-blue-400/20"
+                      className="w-full px-4 py-3 text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-blue-400 dark:focus:ring-blue-400/20"
                     />
                   </div>
 
                   <div>
                     <label
                       htmlFor="password"
-                      className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
+                      className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300"
                     >
                       Parol <span className="text-red-500">*</span>
                     </label>
@@ -152,13 +152,13 @@ export default function Auth() {
                       value={studentData.password}
                       onChange={handleStudentChange}
                       placeholder="Parolingizni kiriting"
-                      className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-700 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-blue-400 dark:focus:ring-blue-400/20"
+                      className="w-full px-4 py-3 text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-blue-400 dark:focus:ring-blue-400/20"
                     />
                   </div>
 
                   <button
                     type="submit"
-                    className="w-full rounded-lg bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-3 text-lg font-semibold text-white shadow-lg transition-all duration-200 hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
+                    className="w-full px-6 py-3 text-lg font-semibold text-white transition-all duration-200 rounded-lg shadow-lg bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
                   >
                     Tizimga kirish
                   </button>

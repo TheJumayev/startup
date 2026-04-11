@@ -21,8 +21,8 @@ const Sidebar = ({ open, onClose }) => {
 
         return (
           <Link key={index} to={fullPath}>
-            <div className="relative mb-3 flex hover:cursor-pointer">
-              <li className="flex cursor-pointer items-center px-8">
+            <div className="relative flex mb-3 hover:cursor-pointer">
+              <li className="flex items-center px-8 cursor-pointer">
                 <span
                   className={`${
                     activeRoute(fullPath)
@@ -45,7 +45,7 @@ const Sidebar = ({ open, onClose }) => {
               </li>
 
               {activeRoute(fullPath) && (
-                <div className="absolute right-0 top-px h-9 w-1 rounded-lg bg-brand-500 dark:bg-brand-400" />
+                <div className="absolute right-0 w-1 rounded-lg top-px h-9 bg-brand-500 dark:bg-brand-400" />
               )}
             </div>
           </Link>
@@ -63,7 +63,7 @@ const Sidebar = ({ open, onClose }) => {
     >
       {/* CLOSE BUTTON */}
       <span
-        className="absolute top-4 right-4 block cursor-pointer xl:hidden"
+        className="absolute block cursor-pointer top-4 right-4 xl:hidden"
         onClick={onClose}
       >
         <HiX />
@@ -72,7 +72,7 @@ const Sidebar = ({ open, onClose }) => {
       {/* LOGO */}
       <div className="mx-[20px] mt-[20px] flex items-center">
         <div className="mt-1 ml-1 h-2.5 font-poppins text-[26px] font-bold uppercase text-navy-700 dark:text-white">
-          EDU.BXU.UZ
+          SMART EDU
         </div>
       </div>
 
@@ -80,17 +80,17 @@ const Sidebar = ({ open, onClose }) => {
 
       {/* MENU */}
       <div className="h-screen pb-36">
-        <ul className="mb-auto h-full overflow-auto pb-20">
+        <ul className="h-full pb-20 mb-auto overflow-auto">
           {createLinks(routes)}
 
           {/* LOGOUT */}
-          <li className="mt-20 px-8">
+          <li className="px-8 mt-20">
             <p
               onClick={() => {
                 localStorage.clear();
                 window.location.href = "/admin/login";
               }}
-              className="cursor-pointer rounded-md p-2 text-sm font-medium text-red-600 hover:bg-gray-100 dark:text-white"
+              className="p-2 text-sm font-medium text-red-600 rounded-md cursor-pointer hover:bg-gray-100 dark:text-white"
             >
               Tizimdan chiqish
             </p>

@@ -69,135 +69,137 @@ const NavbarModern = (props) => {
   }
 
   return (
-    <nav className="sticky top-0 z-40 w-full border-b border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-900">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between gap-4">
-          {/* Left Section: Logo + Brand */}
-          <div className="flex items-center gap-4">
-            <button
-              onClick={onOpenSidenav}
-              className="inline-flex items-center justify-center rounded-lg p-2 text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800 xl:hidden"
-            >
-              <FiAlignJustify className="h-5 w-5" />
-            </button>
+    <nav className="sticky top-0 z-40 w-full border-b shadow-lg border-white/10 bg-white/70 backdrop-blur-xl dark:bg-gray-900/70 dark:border-gray-700/50">
+  <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
+    <div className="flex items-center justify-between h-16 gap-4">
 
-            <div className="hidden sm:block">
-              <div className="flex items-center gap-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-purple-600">
-                  <span className="text-sm font-bold text-white">📚</span>
-                </div>
-                <span className="text-lg font-bold text-gray-900 dark:text-white">
-                  edu.uz
-                </span>
-              </div>
+      {/* Left Section */}
+      <div className="flex items-center gap-4">
+        <button
+          onClick={onOpenSidenav}
+          className="inline-flex items-center justify-center p-2 text-gray-600 transition-all duration-300 group rounded-xl hover:bg-blue-100 hover:scale-110 dark:text-gray-300 dark:hover:bg-gray-800 xl:hidden"
+        >
+          <FiAlignJustify className="w-5 h-5 transition-transform duration-300 group-hover:rotate-180" />
+        </button>
+
+        <div className="hidden sm:block">
+          <div className="flex items-center gap-3 cursor-pointer">
+            <div className="flex items-center justify-center shadow-md h-9 w-9 rounded-xl bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 shadow-blue-500/30 animate-pulse">
+              <span className="text-sm font-bold text-white">📚</span>
             </div>
-          </div>
-
-          {/* Center Section: Search */}
-          <div className="hidden flex-1 md:flex md:max-w-xs">
-            <div className="relative w-full">
-              <FiSearch className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Qidiruv..."
-                value={searchValue}
-                onChange={(e) => setSearchValue(e.target.value)}
-                className="w-full rounded-lg border border-gray-300 bg-white py-2 pl-10 pr-4 text-sm text-gray-900 transition-colors placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
-              />
-            </div>
-          </div>
-
-          {/* Right Section: Icons + Profile */}
-          <div className="flex items-center gap-2 sm:gap-3">
-            {/* Notifications */}
-            <button className="inline-flex items-center justify-center rounded-lg p-2 text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800">
-              <FiBell className="h-5 w-5" />
-            </button>
-
-            {/* Dark Mode Toggle */}
-            <button
-              onClick={() => {
-                if (darkmode) {
-                  document.body.classList.remove("dark");
-                  setDarkmode(false);
-                } else {
-                  document.body.classList.add("dark");
-                  setDarkmode(true);
-                }
-              }}
-              className="inline-flex items-center justify-center rounded-lg p-2 text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
-            >
-              {darkmode ? (
-                <RiSunFill className="h-5 w-5" />
-              ) : (
-                <RiMoonFill className="h-5 w-5" />
-              )}
-            </button>
-
-            {/* Divider */}
-            <div className="h-6 w-px bg-gray-200 dark:bg-gray-700" />
-
-            {/* Profile Dropdown */}
-            <div className="relative">
-              <button
-                onClick={() => setIsProfileOpen(!isProfileOpen)}
-                className="flex items-center gap-2 rounded-lg px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-800"
-              >
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-purple-500">
-                  <MdPerson className="h-5 w-5 text-white" />
-                </div>
-                <span className="hidden text-sm font-medium text-gray-900 dark:text-white sm:inline">
-                  {admin?.name?.split(" ")?.[0] || "Admin"}
-                </span>
-              </button>
-
-              {/* Dropdown Menu */}
-              {isProfileOpen && (
-                <div className="absolute right-0 top-full mt-2 w-48 rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800">
-                  <div className="border-b border-gray-200 px-4 py-3 dark:border-gray-700">
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">
-                      {admin?.name}
-                    </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      Super Admin
-                    </p>
-                  </div>
-
-                  <Link
-                    to="/superadmin/profile"
-                    onClick={() => setIsProfileOpen(false)}
-                    className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
-                  >
-                    <MdPerson className="h-4 w-4" />
-                    Profil
-                  </Link>
-
-                  <button
-                    className="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
-                  >
-                    <FiSettings className="h-4 w-4" />
-                    Sozlamalar
-                  </button>
-
-                  <div className="border-t border-gray-200 dark:border-gray-700">
-                    <button
-                      onClick={() => {
-                        logOut();
-                        setIsProfileOpen(false);
-                      }}
-                      className="flex w-full items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-gray-700"
-                    >
-                      <FiLogOut className="h-4 w-4" />
-                      Chiqish
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
+            <span className="text-lg font-extrabold text-transparent bg-gradient-to-r from-blue-600 via-purple-500 to-pink-500 bg-clip-text">
+              Smart edu
+            </span>
           </div>
         </div>
       </div>
-    </nav>
+
+      {/* Search */}
+      <div className="flex-1 hidden md:flex md:max-w-xs">
+        <div className="relative w-full group">
+          <FiSearch className="absolute w-4 h-4 text-gray-400 transition-colors -translate-y-1/2 left-3 top-1/2 group-focus-within:text-blue-500" />
+          <input
+            type="text"
+            placeholder="Qidiruv..."
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
+            className="w-full rounded-xl border border-gray-300 bg-white/70 backdrop-blur-md py-2 pl-10 pr-4 text-sm text-gray-900 shadow-inner transition-all duration-300 placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-400/30 focus:scale-[1.03] dark:border-gray-600 dark:bg-gray-800/70 dark:text-white"
+          />
+        </div>
+      </div>
+
+      {/* Right Section */}
+      <div className="flex items-center gap-2 sm:gap-3">
+
+        {/* Notifications */}
+        <button className="relative inline-flex items-center justify-center p-2 text-gray-600 transition-all duration-300 group rounded-xl hover:bg-blue-100 hover:scale-110 dark:text-gray-300 dark:hover:bg-gray-800">
+          <FiBell className="w-5 h-5 group-hover:animate-bounce" />
+          <span className="absolute w-2 h-2 bg-red-500 rounded-full -top-1 -right-1 animate-ping"></span>
+        </button>
+
+        {/* Dark Mode */}
+        <button
+          onClick={() => {
+            if (darkmode) {
+              document.body.classList.remove("dark");
+              setDarkmode(false);
+            } else {
+              document.body.classList.add("dark");
+              setDarkmode(true);
+            }
+          }}
+          className="inline-flex items-center justify-center p-2 text-gray-600 transition-all duration-300 group rounded-xl hover:bg-yellow-100 hover:scale-110 dark:text-gray-300 dark:hover:bg-gray-800"
+        >
+          {darkmode ? (
+            <RiSunFill className="w-5 h-5 text-yellow-400 transition-transform duration-500 group-hover:rotate-180" />
+          ) : (
+            <RiMoonFill className="w-5 h-5 text-indigo-500 transition-transform duration-500 group-hover:-rotate-12" />
+          )}
+        </button>
+
+        {/* Divider */}
+        <div className="w-px h-6 bg-gradient-to-b from-transparent via-gray-300 to-transparent dark:via-gray-600" />
+
+        {/* Profile */}
+        <div className="relative">
+          <button
+            onClick={() => setIsProfileOpen(!isProfileOpen)}
+            className="flex items-center gap-2 px-3 py-2 transition-all duration-300 rounded-xl hover:bg-blue-100 hover:scale-105 dark:hover:bg-gray-800"
+          >
+            <div className="flex items-center justify-center rounded-full shadow-lg h-9 w-9 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 shadow-purple-500/30">
+              <MdPerson className="w-5 h-5 text-white" />
+            </div>
+            <span className="hidden text-sm font-semibold text-gray-900 dark:text-white sm:inline">
+              {admin?.name?.split(" ")?.[0] || "Admin"}
+            </span>
+          </button>
+
+          {/* Dropdown */}
+          {isProfileOpen && (
+            <div className="absolute right-0 mt-3 border shadow-2xl top-full w-52 rounded-2xl border-white/20 bg-white/80 backdrop-blur-xl animate-fadeIn dark:border-gray-700 dark:bg-gray-800/80">
+
+              <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+                <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                  {admin?.name}
+                </p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Super Admin
+                </p>
+              </div>
+
+              <Link
+                to="/superadmin/profile"
+                onClick={() => setIsProfileOpen(false)}
+                className="flex items-center gap-2 px-4 py-2 text-sm transition-all hover:bg-blue-50 dark:text-gray-300 dark:hover:bg-gray-700"
+              >
+                <MdPerson className="w-4 h-4" />
+                Profil
+              </Link>
+
+              <button className="flex items-center w-full gap-2 px-4 py-2 text-sm transition-all hover:bg-blue-50 dark:text-gray-300 dark:hover:bg-gray-700">
+                <FiSettings className="w-4 h-4" />
+                Sozlamalar
+              </button>
+
+              <div className="border-t border-gray-200 dark:border-gray-700">
+                <button
+                  onClick={() => {
+                    logOut();
+                    setIsProfileOpen(false);
+                  }}
+                  className="flex items-center w-full gap-2 px-4 py-2 text-sm text-red-500 transition-all hover:bg-red-50 dark:hover:bg-gray-700"
+                >
+                  <FiLogOut className="w-4 h-4" />
+                  Chiqish
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
   );
 };
 

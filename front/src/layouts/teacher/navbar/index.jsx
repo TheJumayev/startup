@@ -49,7 +49,7 @@ const TeacherNavbar = (props) => {
                   <span className="text-sm font-bold text-white">🎓</span>
                 </div>
                 <span className="text-lg font-bold text-gray-900 dark:text-white">
-                  edu.uz
+                 Smart edu
                 </span>
               </div>
             </div>

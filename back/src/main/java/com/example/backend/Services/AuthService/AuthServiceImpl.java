@@ -62,12 +62,27 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public User decode(String token) {
-        System.out.println(token);
-        if (!jwtService.validateToken(token)) {
-            throw new RuntimeException("Token is expired or invalid");
+        try {
+            if (token == null || token.isEmpty()) {
+                throw new RuntimeException("Token is missing");
+            }
+
+            if (!jwtService.validateToken(token)) {
+                throw new RuntimeException("Token is expired or invalid");
+            }
+
+            String userId = jwtService.extractSubjectFromJwt(token);
+
+            UUID uuid = UUID.fromString(userId);
+
+            return userRepo.findById(uuid)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Invalid token format");
+        } catch (Exception e) {
+            throw new RuntimeException("Token decode failed");
         }
-        String userId = jwtService.extractSubjectFromJwt(token);
-        return userRepo.findById(UUID.fromString(userId)).orElseThrow(() -> new RuntimeException("User not found"));
     }
 
     @Override

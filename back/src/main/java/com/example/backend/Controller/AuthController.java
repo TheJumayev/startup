@@ -35,8 +35,17 @@ public class AuthController {
 
     @GetMapping("/decode")
     public HttpEntity<?> decode(@RequestHeader("Authorization") String token) {
-        System.out.println("Received token: " + token);
-        return ResponseEntity.ok(service.decode(token));
+        System.out.println("fuck");
+        String token1 = token.replace("Bearer ", "");
+        User decode = service.decode(token1);
+        return ResponseEntity.ok(decode);
+    }
+
+    @GetMapping("/decode1")
+    public HttpEntity<?> decode1(@RequestParam String token) {
+        String token1 = token.replace("Bearer ", "");
+        User decode = service.decode(token1);
+        return ResponseEntity.ok(decode);
     }
 
     @PutMapping("/password/{adminId}")

@@ -2,6 +2,7 @@ package com.example.backend.Controller;
 
 import com.example.backend.DTO.CurriculmDTO;
 import com.example.backend.Entity.Curriculm;
+import com.example.backend.Entity.User;
 import com.example.backend.Repository.CurriculmRepo;
 import com.example.backend.Repository.GroupsRepo;
 import com.example.backend.Repository.SubjectsRepo;
@@ -12,12 +13,13 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
 @CrossOrigin
-@RequestMapping("/api/v1/curriculm")
+@RequestMapping("/api/v1/curriculums")
 public class CurriculmController {
 
 
@@ -97,6 +99,20 @@ public class CurriculmController {
     @GetMapping
     public ResponseEntity<List<CurriculmDTO>> getAll() {
         List<Curriculm> curriculms = curriculumRepo.findAll();
+        List<CurriculmDTO> dtos = curriculms.stream()
+                .map(this::mapToCurriculmDTO)
+                .toList();
+        return ResponseEntity.ok(dtos);
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<CurriculmDTO>> getByUserId(@PathVariable UUID userId) {
+        Optional<User> userOptional = userRepo.findById(userId);
+        if(userOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        User user = userOptional.get();
+        List<Curriculm> curriculms = curriculumRepo.findByUserId(user.getId());
         List<CurriculmDTO> dtos = curriculms.stream()
                 .map(this::mapToCurriculmDTO)
                 .toList();

@@ -5,6 +5,7 @@ import StudentLayout from "layouts/student";
 import Login from "./views/student/login/Login";
 import LoginAdmin from "./config/login/Login";
 import SuperAdminLayoutModern from "layouts/superadmin/index";
+import TeacherLayout from "layouts/teacher/index";
 import ErrorPage from "./404/404";
 
 const App = () => {
@@ -12,6 +13,7 @@ const App = () => {
     <>
       <Routes>
         <Route path="superadmin/*" element={<SuperAdminLayoutModern />} />
+        <Route path="teacher/*" element={<TeacherLayout />} />
         <Route path="admin/*" element={<AdminLayout />} />
         <Route path="student/*" element={<StudentLayout />} />
         <Route path="/" element={<Navigate to="/student" replace />} />

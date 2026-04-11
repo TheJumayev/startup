@@ -52,6 +52,7 @@ pnpm-debug.log*
 /backend/.mvn/
 /backend/mvnw
 /backend/mvnw.cmd
+/back/src/main/resources/application.properties
 
 # Gradle
 .gradle/

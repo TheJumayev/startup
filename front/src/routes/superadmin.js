@@ -4,6 +4,7 @@ import GroupsModern from "views/superadmin/groups/GroupsModern";
 import GroupDetailModern from "views/superadmin/groups/GroupDetailModern";
 import SubjectsModern from "views/superadmin/subjects";
 import CurriculumModern from "views/superadmin/curriculum/CurriculumModern";
+import UsersModern from "views/superadmin/users";
 
 import {
     MdHome,
@@ -43,6 +44,13 @@ const routesModern = [
         path: "curriculum",
         icon: <MdSchool className="h-6 w-6" />,
         component: <CurriculumModern />,
+    },
+    {
+        name: "Foydalanuvchilar",
+        layout: "/superadmin",
+        path: "users",
+        icon: <MdPeople className="h-6 w-6" />,
+        component: <UsersModern />,
     },
 
     {

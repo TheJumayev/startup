@@ -31,4 +31,7 @@ public class Task {
 
     @OneToMany(mappedBy = "task", cascade = CascadeType.ALL)
     private List<TaskQuestion> questions;
+
+    @ManyToOne
+    private Lesson lesson;
 }

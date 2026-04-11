@@ -42,6 +42,7 @@ export default function Auth() {
       }
       const roles = response.data.roles || [];
       localStorage.setItem("roles", JSON.stringify(roles));
+      console.log(roles[0].name);
       if (roles.length > 0) {
         if (roles[0].name === "ROLE_ADMIN") navigate("/admin");
         else if (roles[0].name === "ROLE_SUPERADMIN") {

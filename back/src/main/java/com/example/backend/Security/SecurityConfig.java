@@ -39,8 +39,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(
                         auth -> auth
                                 // Auth endpointlar
-                                .requestMatchers("/api/v1/auth/login").permitAll()
-                                .requestMatchers("/api/v1/auth/refresh").permitAll()
+                                .requestMatchers("/api/v1/auth/**").permitAll()
                                 // Student login/register
                                 .requestMatchers("/api/v1/students/login").permitAll()
                                 .requestMatchers("/api/v1/students/register").permitAll()
@@ -54,8 +53,14 @@ public class SecurityConfig {
                                 .requestMatchers("/api/v1/subjects/**").permitAll()
                                 .requestMatchers("/api/v1/subjects").permitAll()
                                 // Curriculum
-                                .requestMatchers("/api/v1/curriculm/**").permitAll()
-                                .requestMatchers("/api/v1/curriculm").permitAll()
+                                .requestMatchers("/api/v1/curriculums/**").permitAll()
+                                .requestMatchers("/api/v1/curriculums").permitAll()
+                                // Lessons
+                                .requestMatchers("/api/v1/lessons/**").permitAll()
+                                .requestMatchers("/api/v1/lessons").permitAll()
+                                // Roles
+                                .requestMatchers("/api/v1/role/**").permitAll()
+                                .requestMatchers("/api/v1/role").permitAll()
                                 // Admin
                                 .requestMatchers("/api/v1/admin/**").permitAll()
                                 // Files

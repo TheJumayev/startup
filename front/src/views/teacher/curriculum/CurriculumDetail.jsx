@@ -11,7 +11,6 @@ import {
   MdMenuBook,
   MdAttachFile,
   MdFileDownload,
-  MdImage,
   MdUploadFile,
   MdRemoveCircle,
 } from "react-icons/md";
@@ -30,7 +29,7 @@ const CurriculumDetail = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [formData, setFormData] = useState({ name: "" });
   const [selectedFiles, setSelectedFiles] = useState([]);
-  const [existingAttachmentIds, setExistingAttachmentIds] = useState([]);
+  const [existingAttachments, setExistingAttachments] = useState([]);
 
   useEffect(() => {
     if (curriculmId) {
@@ -90,7 +89,7 @@ const CurriculumDetail = () => {
   const resetForm = () => {
     setFormData({ name: "" });
     setSelectedFiles([]);
-    setExistingAttachmentIds([]);
+    setExistingAttachments([]);
     setEditingId(null);
   };
 
@@ -104,7 +103,35 @@ const CurriculumDetail = () => {
   };
 
   const removeExistingAttachment = (attId) => {
-    setExistingAttachmentIds((prev) => prev.filter((id) => id !== attId));
+    setExistingAttachments((prev) => prev.filter((att) => att.id !== attId));
+  };
+
+  const handleRemoveAttachment = async (lessonId, attachmentId) => {
+    if (!window.confirm("Haqiqatan ham bu faylni o'chirmoqchimisiz?")) return;
+    try {
+      setLoading(true);
+      setError("");
+      const res = await ApiCall(
+        `/api/v1/lessons/${lessonId}/attachments/${attachmentId}`,
+        "DELETE",
+        null
+      );
+      if (res?.error) {
+        setError(
+          typeof res.data === "string"
+            ? res.data
+            : res.data?.message || "Faylni o'chirishda xatolik"
+        );
+        return;
+      }
+      setSuccessMsg("🗑️ Fayl o'chirildi");
+      fetchLessons();
+    } catch (err) {
+      console.error(err);
+      setError("❌ Faylni o'chirishda xatolik");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -144,7 +171,7 @@ const CurriculumDetail = () => {
           const payload = {
             name: formData.name,
             curriculmId: curriculmId,
-            attachmentIds: existingAttachmentIds,
+            attachmentIds: existingAttachments.map((att) => att.id),
           };
           const res = await ApiCall(`/api/v1/lessons/${editingId}`, "PUT", payload);
           if (res?.error) {
@@ -205,7 +232,7 @@ const CurriculumDetail = () => {
 
   const handleEdit = (lesson) => {
     setFormData({ name: lesson.name || "" });
-    setExistingAttachmentIds(lesson.attachmentIds || []);
+    setExistingAttachments(lesson.attachments || []);
     setSelectedFiles([]);
     setEditingId(lesson.id);
     setShowForm(true);
@@ -251,7 +278,53 @@ const CurriculumDetail = () => {
     }
   };
 
-  const getFileDownloadUrl = (attId) => `${baseUrl}/api/v1/file/getFile/${attId}`;
+  const handleDownload = async (fileId, fileName) => {
+    try {
+      const token = localStorage.getItem("access_token");
+
+      const response = await fetch(
+        `${baseUrl}/api/v1/file/getFile/${fileId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // 🔥 MUHIM
+          },
+        }
+      );
+
+      const blob = await response.blob();
+
+      // 🔥 NOMNI TO‘G‘RILASH
+      const realName = getRealName(fileName);
+      const ext = getExtension(fileName);
+
+      const finalName = realName.includes(".")
+        ? realName
+        : `file-${fileId.substring(0, 8)}${ext}`;
+
+      // 🔥 DOWNLOAD
+      const link = document.createElement("a");
+      link.href = window.URL.createObjectURL(blob);
+      link.download = finalName;
+      link.click();
+
+      window.URL.revokeObjectURL(link.href);
+
+      setSuccessMsg("📥 Fayl yuklab olindi");
+    } catch (err) {
+      console.error(err);
+      setError("❌ Yuklab olishda xatolik");
+    }
+  };
+
+  const getExtension = (fileName) => {
+    if (!fileName) return "";
+    const index = fileName.lastIndexOf(".");
+    return index !== -1 ? fileName.substring(index) : "";
+  };
+  const getRealName = (fileName) => {
+    if (!fileName) return "file";
+    return fileName.split("__")[1] || fileName;
+  };
 
   if (loading && !curriculum)
     return (
@@ -357,31 +430,30 @@ const CurriculumDetail = () => {
               </div>
 
               {/* Mavjud fayllar (tahrirlashda) */}
-              {editingId && existingAttachmentIds.length > 0 && (
+              {editingId && existingAttachments.length > 0 && (
                 <div>
                   <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300">
                     Mavjud fayllar
                   </label>
                   <div className="space-y-2">
-                    {existingAttachmentIds.map((attId) => (
+                    {existingAttachments.map((att) => (
                       <div
-                        key={attId}
+                        key={att.id}
                         className="flex items-center justify-between rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 dark:border-gray-600 dark:bg-gray-700"
                       >
                         <div className="flex items-center gap-2 overflow-hidden">
                           <MdAttachFile className="h-4 w-4 flex-shrink-0 text-blue-500" />
-                          <a
-                            href={getFileDownloadUrl(attId)}
-                            target="_blank"
-                            rel="noreferrer"
+                          <button
+                            type="button"
+                            onClick={() => handleDownload(att.id, att.name)}
                             className="truncate text-sm text-blue-600 hover:underline dark:text-blue-400"
                           >
-                            Fayl: {attId.substring(0, 8)}...
-                          </a>
+                            {getRealName(att.name)}
+                          </button>
                         </div>
                         <button
                           type="button"
-                          onClick={() => removeExistingAttachment(attId)}
+                          onClick={() => removeExistingAttachment(att.id)}
                           className="ml-2 flex-shrink-0 text-red-500 hover:text-red-700"
                           title="Faylni olib tashlash"
                         >
@@ -515,32 +587,39 @@ const CurriculumDetail = () => {
               </div>
 
               {/* Fayllar */}
-              {lesson.attachmentIds && lesson.attachmentIds.length > 0 && (
+              {lesson.attachments && lesson.attachments.length > 0 && (
                 <div className="mt-4 border-t border-gray-200 pt-4 dark:border-gray-700">
                   <p className="mb-2 flex items-center gap-1 text-sm font-semibold text-gray-600 dark:text-gray-400">
                     <MdAttachFile className="h-4 w-4" />
-                    Biriktirilgan fayllar ({lesson.attachmentIds.length})
+                    Biriktirilgan fayllar ({lesson.attachments.length})
                   </p>
                   <div className="flex flex-wrap gap-2">
-                    {lesson.attachmentIds.map((attId) => (
+                    {lesson.attachments.map((att) => (
                       <div
-                        key={attId}
+                        key={att.id}
                         className="flex items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 dark:border-gray-600 dark:bg-gray-700"
                       >
                         <MdAttachFile className="h-4 w-4 text-blue-500" />
-                        <span className="text-xs text-gray-500 dark:text-gray-400">
-                          {attId.substring(0, 8)}...
+
+                        <span className="text-xs text-gray-700 dark:text-gray-300">
+                          {getRealName(att.name)}
                         </span>
-                        <a
-                          href={getFileDownloadUrl(attId)}
-                          target="_blank"
-                          rel="noreferrer"
+
+                        <button
+                          onClick={() => handleDownload(att.id, att.name)}
                           className="inline-flex items-center gap-1 rounded bg-blue-100 px-2 py-1 text-xs font-medium text-blue-600 hover:bg-blue-200 dark:bg-blue-900/30 dark:text-blue-400"
                           title="Yuklab olish"
                         >
-                          <MdFileDownload className="h-3.5 w-3.5" /> Yuklab olish
-                        </a>
+                          <MdFileDownload className="h-3.5 w-3.5" />
+                        </button>
 
+                        <button
+                          onClick={() => handleRemoveAttachment(lesson.id, att.id)}
+                          className="inline-flex items-center gap-1 rounded bg-red-100 px-2 py-1 text-xs font-medium text-red-600 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-400"
+                          title="Faylni o'chirish"
+                        >
+                          <MdRemoveCircle className="h-3.5 w-3.5" />
+                        </button>
                       </div>
                     ))}
                   </div>

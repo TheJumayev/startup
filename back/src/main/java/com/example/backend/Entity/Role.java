@@ -13,6 +13,7 @@ import org.springframework.security.core.GrantedAuthority;
 @Data
 public class Role implements GrantedAuthority {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @Column(unique = true, nullable = false)

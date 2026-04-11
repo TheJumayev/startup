@@ -1,5 +1,6 @@
 package com.example.backend.Controller;
 
+import com.example.backend.DTO.AttachmentDTO;
 import com.example.backend.DTO.LessonDTO;
 import com.example.backend.Entity.Attachment;
 import com.example.backend.Entity.Curriculm;
@@ -12,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -34,8 +34,10 @@ public class LessonController {
                 return ResponseEntity.badRequest().body(Map.of("error", true, "message", "Lesson nomi bo'sh bo'lishi mumkin emas"));
             }
 
-            List<Attachment> attachments = (dto.getAttachmentIds() != null && !dto.getAttachmentIds().isEmpty())
-                    ? attachmentRepo.findAllById(dto.getAttachmentIds())
+            List<Attachment> attachments = (dto.getAttachments() != null && !dto.getAttachments().isEmpty())
+                    ? attachmentRepo.findAllById(
+                    dto.getAttachments().stream().map(AttachmentDTO::getId).toList()
+            )
                     : List.of();
 
             Curriculm curriculm = null;
@@ -158,8 +160,12 @@ public class LessonController {
                 }
                 lesson.setCurriculm(curriculm);
             }
-            if (dto.getAttachmentIds() != null) {
-                lesson.setAttachment(attachmentRepo.findAllById(dto.getAttachmentIds()));
+            if (dto.getAttachments() != null) {
+                lesson.setAttachment(
+                        attachmentRepo.findAllById(
+                                dto.getAttachments().stream().map(AttachmentDTO::getId).toList()
+                        )
+                );
             }
             if (dto.getCreatedAt() != null) {
                 lesson.setCreatedAt(dto.getCreatedAt());
@@ -221,6 +227,49 @@ public class LessonController {
         }
     }
 
+    // REMOVE ATTACHMENT from Lesson (faylni lessondan olib tashlash + diskdan o'chirish)
+    @DeleteMapping("/{lessonId}/attachments/{attachmentId}")
+    public ResponseEntity<?> removeAttachment(
+            @PathVariable UUID lessonId,
+            @PathVariable UUID attachmentId
+    ) {
+        try {
+            Lesson lesson = lessonRepo.findById(lessonId).orElse(null);
+            if (lesson == null) {
+                return ResponseEntity.badRequest().body(Map.of("error", true, "message", "Lesson topilmadi"));
+            }
+
+            Attachment attachment = attachmentRepo.findById(attachmentId).orElse(null);
+            if (attachment == null) {
+                return ResponseEntity.badRequest().body(Map.of("error", true, "message", "Attachment topilmadi"));
+            }
+
+            // Lessondan attachmentni olib tashlash
+            if (lesson.getAttachment() != null) {
+                lesson.getAttachment().removeIf(a -> a.getId().equals(attachmentId));
+                lessonRepo.save(lesson);
+            }
+
+            // Diskdan faylni o'chirish
+            String filePath = "backend/files" + attachment.getPrefix() + "/" + attachment.getName();
+            java.io.File file = new java.io.File(filePath);
+            if (file.exists()) {
+                file.delete();
+            }
+
+            // Bazadan attachmentni o'chirish
+            attachmentRepo.delete(attachment);
+
+            return ResponseEntity.ok(Map.of(
+                    "error", false,
+                    "message", "Fayl o'chirildi",
+                    "lesson", toDTO(lessonRepo.findById(lessonId).orElse(lesson))
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", true, "message", e.getMessage()));
+        }
+    }
+
     // DELETE
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable UUID id) {
@@ -231,14 +280,16 @@ public class LessonController {
         return ResponseEntity.ok(Map.of("error", false, "message", "Lesson o'chirildi"));
     }
 
-    // Entity -> DTO
     private LessonDTO toDTO(Lesson lesson) {
         return new LessonDTO(
                 lesson.getId(),
                 lesson.getName(),
                 lesson.getCurriculm() != null ? lesson.getCurriculm().getId() : null,
                 lesson.getAttachment() != null
-                        ? lesson.getAttachment().stream().map(Attachment::getId).toList()
+                        ? lesson.getAttachment()
+                        .stream()
+                        .map(att -> new AttachmentDTO(att.getId(), att.getName())) // 🔥 ASOSIY O'ZGARISH
+                        .toList()
                         : List.of(),
                 lesson.getCreatedAt()
         );

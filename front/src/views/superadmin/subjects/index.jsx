@@ -229,27 +229,25 @@ const SubjectsModern = () => {
               <thead className="border-b border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-900">
               <tr>
                 <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white">
+                  №
+                </th> <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white">
                   Nomi
                 </th>
-                <th className="hidden px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white md:table-cell">
-                  O'quv dasturi
-                </th>
+
                 <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white">
                   Amallar
                 </th>
               </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-              {filteredSubjects.map((subject) => (
+              {filteredSubjects.map((subject, index) => (
                 <tr key={subject.id} className="transition-colors hover:bg-gray-50 dark:hover:bg-gray-700/50">
                   <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
+                    {index+1}
+                  </td><td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
                     {subject.name}
                   </td>
-                  <td className="hidden px-6 py-4 text-sm text-gray-600 dark:text-gray-400 md:table-cell">
-                      <span className="inline-block rounded-full bg-blue-50 px-3 py-1 text-sm font-medium text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
-                        {curriculums.find(c => c.id === subject.curriculumId)?.name || "—"}
-                      </span>
-                  </td>
+
                   <td className="px-6 py-4">
                     <div className="flex gap-2">
                       <button
